@@ -1,8 +1,8 @@
 /*
  * @Author: your name
  * @Date: 2021-07-01 09:20:52
- * @LastEditTime: 2021-07-07 09:41:47
- * @LastEditors: your name
+ * @LastEditTime: 2021-07-10 18:12:17
+ * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/DP/1.股票/3.股票买卖的时机3.js
  */
@@ -19,7 +19,7 @@
  * 6. 时间复杂度 ${O(N)}$,空间复杂度 ${O(N)}$
  */
 var maxProfit = function (prices) {
-    let dp = new Array(prices.length).fill(null).map(() => new Array(3).fill(null).map(() => new Array(2).fill(0)))
+    let dp = Array.from(prices).map(() => Array.from({length:3}).map(() => new Array(2)))
     for (let i = 0; i < prices.length; i++) {
     for (let k = 1; k <= 2; k++) {
         // 重点 -- base case 1
