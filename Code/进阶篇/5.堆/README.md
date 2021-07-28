@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-07-25 11:06:42
- * @LastEditTime: 2021-07-27 10:20:40
+ * @LastEditTime: 2021-07-28 08:55:01
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/进阶篇/5.堆/README.md
@@ -404,4 +404,103 @@ function mergeTwoList (list1,list2){
     if(list2) cur.next = list2
     return emptyNode.next
 }
+```
+
+## [451. 根据字符出现频率排序](https://leetcode-cn.com/problems/sort-characters-by-frequency/solution/dui-pai-by-jzsq_lyx-cwbx/)
+### 分析
+1. 既然是要按照出现评率进行新组装，所以先遍历一次字符串，用 map 将字符和出现频率作为一组 item 保存起来 -- 时间空间复杂度都是 ${O(N)}$
+2. 这个时候其实只要按照频率从到到小排列好，然后一一取出重装即可
+3. 这边是用堆排序,但是item 不再是简单的数字，而是一个数组 [key,value]，所以相应的方法微调即可
+4. 堆排是时间复杂度:${O(NlogN)}$, 最终的空间复杂度是 ${O(N)}$
+```javascript
+// 451. 根据字符出现频率排序
+
+var frequencySort = function (s) {
+    let ret = "";
+    if (!s) return s;
+    const map = new Map();
+    const heap = new MaxHeap();
+    for (let i = 0; i < s.length; i++) {
+      const item = s[i];
+      if (map.has(item)) {
+        map.set(item, map.get(item) + 1);
+      } else {
+        map.set(item, 1);
+      }
+    }
+    // 加入堆中，元素值是 [key,value], 要用 value 来进行比对
+    for (let item of map.entries()) {
+      heap.add(item);
+    }
+    while (heap.data[0]) {
+      const item = heap.pop();
+      ret += item[0].repeat(item[1]);
+    }
+    return ret;
+  };
+  
+  class MaxHeap {
+    constructor() {
+      this.data = [];
+      this.data[0] = 0;
+    }
+  
+    down(index) {
+      const lastIndex = this.data[0]; //最后一个值的下标值
+      while (index << 1 <= lastIndex) {
+        let child = index << 1;
+        if (
+          child !== lastIndex &&
+          this.data[child + 1][1] > this.data[child][1]
+        ) {
+          child++;
+        }
+        if (this.data[child][1] > this.data[index][1]) {
+          // 注意，item 是数组，所以用第二个值做比对，但是交换的是整个 item
+          [this.data[child], this.data[index]] = [
+            this.data[index],
+            this.data[child],
+          ];
+          index = child;
+        } else {
+          break;
+        }
+      }
+    }
+  
+    upper() {
+      let index = this.data[0];
+      while (index >> 1 > 0) {
+        const father = index >> 1;
+        if (this.data[father][1] < this.data[index][1]) {
+          // 注意，item 是数组，所以用第二个值做比对，但是交换的是整个 item
+          [this.data[father], this.data[index]] = [
+            this.data[index],
+            this.data[father],
+          ];
+          index = father;
+        } else {
+          break;
+        }
+      }
+    }
+  
+    add(item) {
+      this.data.push(item);
+      this.data[0]++;
+      this.upper();
+    }
+  
+    pop() {
+      [this.data[1], this.data[this.data[0]]] = [
+        this.data[this.data[0]],
+        this.data[1],
+      ];
+      this.data[0]--;
+      const temp = this.data.pop();
+      this.down(1)
+      return temp
+    }
+  }
+  
 ```
