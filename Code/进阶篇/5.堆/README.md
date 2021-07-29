@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-07-25 11:06:42
- * @LastEditTime: 2021-07-28 08:55:01
+ * @LastEditTime: 2021-07-29 09:47:29
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/进阶篇/5.堆/README.md
@@ -503,4 +503,91 @@ var frequencySort = function (s) {
     }
   }
   
+```
+
+## [378. 有序矩阵中第 K 小的元素](https://leetcode-cn.com/problems/kth-smallest-element-in-a-sorted-matrix/solution/dui-pai-by-jzsq_lyx-njls/)
+### 分析
+1. 这里就是 item 为数组的 bottomK， 和正常的 top K 只是多了以数组作为元素的处理
+2. 使用堆排的时候，只需要整理函数 down 和 upper 比对的时候弄一下就好了
+3. 不过有一个区别就是，这个 K 有可能大于二维数组的数组长度 Len(matrix), 所以不能直接创建一个 K 大大顶堆取堆顶，反而要将二维数组所有元素都编入到 Len 大小的小顶堆中，然后再取 K 次
+4. 这也说明了 top K 这类题的两种堆解法，要不就是设置 K 大/小 的堆，然后不断用元素去替代，要不设置全部元素的堆，然后弹出 K 次值；
+5. 时间/空间复杂度 ${O(NlogN)}$
+
+```javascript
+// 378. 有序矩阵中第 K 小的元素
+
+/**
+ * @分析 -- 第 K 小
+ * 1. 这里给的排好序的矩阵，那么可以用小顶堆将矩阵中元素转移到小顶堆中，每次从堆顶取值后整理，取到第 K 个即可
+ */
+var kthSmallest = function(matrix, k) {
+    const minHeap = new MinHeap()
+    for(let i = 0;i<matrix.length;i++){
+        minHeap.add(matrix[i])
+    }
+    const ret = []
+    while(--k){
+        minHeap.pop()
+    }
+    return minHeap.pop()
+
+};
+
+class MinHeap {
+    constructor(){
+        this.data = []
+        this.data[0] = 0
+    }
+
+    down(index){
+        const lastIndex = this.data[0]
+        while(index<<1 <= lastIndex){
+            let child = index << 1
+            if(child!==lastIndex && this.data[child+1][0]< this.data[child][0]){
+                child++
+            }
+            if(this.data[child][0]< this.data[index][0]){
+                [this.data[child], this.data[index]] = [this.data[index], this.data[child]]
+                index = child
+            }else {
+                break
+            }
+        }
+    }
+
+    upper() {
+        let index = this.data[0]
+        while(index >>1 > 0){
+            let father = index >> 1 
+            if(this.data[father][0]> this.data[index][0]){
+                [this.data[father], this.data[index]] = [this.data[index], this.data[father]]
+                index = father
+            }else {
+                break
+            }
+        }
+    }
+
+    add(item){
+        this.data.push(item)
+        this.data[0]++
+        this.upper()
+    }
+
+    // 这里不是直接弹出 item，而只是弹出堆顶的第一个字母，然后再整理
+    pop(){
+        const temp = this.data[1].shift()
+        if(!this.data[1].length){
+             // 数组空了
+             this.data[1] = this.data[this.data[0]]
+             this.data.pop()
+             this.data[0]--
+        }
+        this.down(1)
+        return temp
+    }
+}
+
+const ret = kthSmallest([[1,5,9],[10,11,13],[12,13,15]],8)
+console.log(ret)
 ```
