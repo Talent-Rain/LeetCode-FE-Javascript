@@ -1,7 +1,43 @@
+
+## 前言
+对于我与堆的渊源，那得从2年前说起，那时候我年少轻狂，意气风发，刚入前端之门就憧憬着1年打开大厂之门，3年P7 走上人生巅峰；
+
+是他，那个男人，用那么的一道猥琐而又不失分寸的算法将我从云端拉回来，那道题就是 [215. 数组中的第K个最大元素](https://leetcode-cn.com/problems/kth-largest-element-in-an-array/solution/xiao-ding-dui-by-jzsq_lyx-dnb7/)
+
+而这也是我正式学习算法的起点，以前总是有一些有理无用之言 `当你觉得应该学习算法的时候，就是学习算法的最好时候`；年轻的我竟然还信了他的鬼话，认为还没到时候，直到被上文那个男人打击之后，发誓要成为一个 `会 topk 的菜鸡`
+
+然而，时隔两年，兜兜转转，我终于第二次遇到了这个我的一生之敌，而我缺徘徊，无措，不知如何下手，最后忍痛 sort 一下，被面试官疑惑的 `??? 你咋还排起序来呢`，感觉自己被糊了一脸，于是，我重新捡起了 `堆` 这么一个专题，发誓事不过三。
+
+## 正文
+
+你以为我要来开始讲算法了吗？怎么可能，我就一个菜鸡，怎么也比不上市面上大佬讲的清楚，讲得透彻，我就是单纯找个借口，将自己这周写的一些题目和分析贴上来，供使用 JS 的小伙伴们刷一下；
+
+那么菜鸡的分析肯定是比不上大佬们的，但是茅坑里的...石头也是有用的，那么我这有啥用呢，那就是我的思维可能和很多与我差不多，所以你想歪了的地方，我肯定也想歪了，比方说 `创建完二叉堆之后，为啥数组不是已经排完序的，是我弄错了吗？`，不，XDM，这个错误很多菜鸟都会遇到，天真的以为创建完堆，然后就得到一个完美的数组，随之只有表面一层是真的米，里面全是沙子；
+
+所以啊，菜鸟的思维的优势在于，大佬们可能不屑于解释`显然可得`的地方，菜鸟如我，可能需要写点注释啥的，所以还是有那么一点帮助...的吧
+
+以上观点也是我菜鸟的思维，或者更高思维上，我这个是幼稚的，不符合实际的，但是那又如何呢，我就是写了，我爽了就行啊。
+
+那么下面才是正文；
+
+## 正文 plus
+
+堆是动态求极值的数据结构，所以当遇到需要不断取极值的时候，就可以考虑用堆了
+
+温馨提示，建议每一道题都自己 new 一个堆，这样才能发现堆之美，其实就是不会再次遇到 topK 的时候只能用冒泡来做。
+
+
+行文至此也该结束了，如果有 10 个关注，那就更新一下下一 part， dp 或者树吧， thx。
+
+对了，那个男人的网页，你不看一下吗 [几乎刷完了力扣所有的堆题，我发现了这些东西。。。](https://leetcode-solution-leetcode-pp.gitbook.io/leetcode-solution/thinkings/heap)
+
+
+
+
 <!--
  * @Author: your name
  * @Date: 2021-07-25 11:06:42
- * @LastEditTime: 2021-07-29 09:47:29
+ * @LastEditTime: 2021-07-30 09:24:09
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/进阶篇/5.堆/README.md
@@ -591,3 +627,134 @@ class MinHeap {
 const ret = kthSmallest([[1,5,9],[10,11,13],[12,13,15]],8)
 console.log(ret)
 ```
+
+## [1054. 距离相等的条形码](https://leetcode-cn.com/problems/distant-barcodes/solution/dui-pai-mo-shi-tou-by-jzsq_lyx-a615/)
+### 分析
+1. 为了保证两两不相等，那得保证数量最多的那个条码必须先排完，防止排完其他就省它自个儿了；
+2. 所以先用 map 存储所有条码值(key)和数量(value)
+3. 这个时候就和[1046. 最后一块石头的重量](https://leetcode-cn.com/problems/last-stone-weight/solution/)很像了;
+4. 但是还有一点区别，就是每次你取出最大的两块，都只能取走一份进行排列，然后就要把剩下的放回去，保证每一次取两个值都是最大；这就好比，我们这道题是去磨石头，每次相互之间磨掉一层皮，每一次都要拿最后的石头去磨，而[1046. 最后一块石头的重量](https://leetcode-cn.com/problems/last-stone-weight/solution/) 是直接两个一砸就结束了；
+5. map 存储时，时间复杂度和空间复杂度都是 ${O(N)}$, N 是长度； 堆排，这个算不出来了，大概也是 ${O(NlogN)}$ 吧
+
+```javascript
+// 1054. 距离相等的条形码
+
+var rearrangeBarcodes = function (barcodes) {
+  // 1. 将条形码的值和数量用 map 存储起来
+  const map = new Map();
+  for (let i = 0; i < barcodes.length; i++) {
+    const item = barcodes[i];
+    if (map.has(item)) {
+      map.set(item, map.get(item) + 1);
+    } else {
+      map.set(item, 1);
+    }
+  }
+  // 2.创建最大堆，进行堆排
+  const heap = new MaxHeap();
+  for (let item of map.entries()) {
+    heap.add(item); // [key,value]
+  }
+
+  // 3. 每次取出最大的两个 item 进行重写排列
+  const ret = [];
+  while (heap.data[0] > 1) {
+    // 这里是默认是保证存在答案，所以即便最后还有item，那么对应的值也只有1个
+    // 但是如果条件没有已知，那么就可以根据这个值进行判断是否成功了
+    const first = heap.pop();
+    const second = heap.pop();
+    // Error:错误
+    // while(second[1]--){
+    //     ret.push(first[0])
+    //     ret.push(second[0])
+    //     first[1]--
+    // }
+
+    ret.push(first[0]);
+    first[1]--;
+    ret.push(second[0]);
+    second[1]--;
+    // 然后就要放回去了
+
+    if (first[1]) {
+      // 如果还有值，放回堆里再来
+      heap.add(first);
+    }
+    if (second[1]) {
+      // 如果还有值，放回堆里再来
+      heap.add(second);
+    }
+  }
+  if (heap.data[0]) {
+    ret.push(heap.pop()[0]);
+  }
+  return ret;
+};
+
+class MaxHeap {
+  constructor() {
+    this.data = [];
+    this.data[0] = 0;
+  }
+
+  down(index) {
+    const lastIndex = this.data[0];
+    while (index << 1 <= lastIndex) {
+      let child = index << 1;
+      if (
+        child !== lastIndex &&
+        this.data[child + 1][1] > this.data[child][1]
+      ) {
+        child++;
+      }
+      if (this.data[child][1] > this.data[index][1]) {
+        [this.data[child], this.data[index]] = [
+          this.data[index],
+          this.data[child],
+        ];
+        index = child;
+      } else {
+        break;
+      }
+    }
+  }
+
+  upper() {
+    let index = this.data[0];
+    while (index >> 1 > 0) {
+      let father = index >> 1;
+      if (this.data[father][1] < this.data[index][1]) {
+        [this.data[father], this.data[index]] = [
+          this.data[index],
+          this.data[father],
+        ];
+        index = father;
+      } else {
+        break;
+      }
+    }
+  }
+
+  add(item) {
+    this.data.push(item);
+    this.data[0]++;
+    this.upper();
+  }
+
+  pop() {
+    [this.data[1], this.data[this.data[0]]] = [
+      this.data[this.data[0]],
+      this.data[1],
+    ];
+    const item = this.data.pop();
+    this.data[0]--;
+    this.down(1);
+    return item;
+  }
+}
+
+console.log(rearrangeBarcodes([7, 7, 7, 8, 5, 7, 5, 5, 5, 8]));
+
+```
+
+
