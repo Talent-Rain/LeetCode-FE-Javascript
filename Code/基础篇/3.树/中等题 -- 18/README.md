@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-08-01 10:35:44
- * @LastEditTime: 2021-08-01 15:20:42
+ * @LastEditTime: 2021-08-02 09:46:37
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/基础篇/3.树/中等题 -- 18/README.md
@@ -166,4 +166,116 @@ var distanceK = function (root, target, k) {
   return ret;
 };
 
+```
+
+
+## [面试题 04.06. 后继者](https://leetcode-cn.com/problems/successor-lcci/solution/zhong-xu-bian-li-by-jzsq_lyx-ya15/)
+
+分析
+ 1. 根据中序遍历，将所有的节点都保存到数组中，然后找到 P 的时候，保存下一个值的下标，然后遍历结束后，从数组中取即可
+ 2. 时间和空间复杂度都是 ${O(N)}$
+
+```javascript
+// 面试题 04.06. 后继者
+
+/**
+ * @分析
+ * 1. 根据中序遍历，找出节点 P 下一个节点 Q；
+ */
+ var inorderSuccessor = function(root, p) {
+    if(!root) return null
+    let arr = []
+    let ret = 0
+    const dfs = (root) => {
+        if(!root) return 
+        dfs(root.left)
+        arr.push(root)
+        if(root === p) {
+            ret = arr.length
+        }
+        dfs(root.right)
+
+    }
+     dfs(root)
+     return arr[ret] || null 
+};
+```
+
+## [98. 验证二叉搜索树](https://leetcode-cn.com/problems/validate-binary-search-tree/solution/bst-te-xing-qiu-jie-by-jzsq_lyx-dzhi/)
+分析
+1. 二叉搜索树的特征: 根节点大于左节点，小于右节点
+2. 前序遍历过程中，是单增的过程；
+3. 我们不需要维护一个数组，只需要维护上一个值做大小判断就好
+4. 所以前序遍历过程中，然后和一个全局遍历进行大小比较即可；
+
+```javascript
+ var isValidBST = function(root) {
+    if(!root) return false
+    let pre = -Infinity //最小值
+    let ret = true // 默认就是
+    const inorder  = (root) => {
+     
+        if(root.left && ret) inorder(root.left)
+           if(root.val<=pre) {
+            ret = false // 一旦有一组失败，都不是 BST
+            return
+        }else {
+            pre = root.val
+        }
+        if(root.right && ret) inorder(root.right)
+    }
+    inorder(root)
+    return ret
+};
+```
+
+
+
+## [99. 恢复二叉搜索树](https://leetcode-cn.com/problems/recover-binary-search-tree/solution/bao-li-by-jzsq_lyx-sjai/)
+
+分析
+1. 既然提示使用 ${O(N)}$ 空间复杂度很容易实现，那就是如果直接用数组保存中序遍历的数组，得到结果比较简单，所以我们就来一下暴力解法
+2. 先中序遍历得到一个节点数组
+3. 这个数组的值肯定不是单增的，那么就是存在两个值和排序后不一样，所以另开一个数组存储值，排序后，再比对，然后改变节点的对应的值
+4. 时间复杂度 ${O(nlogn)}$, 空间复杂度 ${O(N)}$
+```javascript
+// 暴力法 -- 空间复杂度为 ${O(N)}$
+var recoverTree = function(root) {
+    const ret = []
+    const dfs = (root) => {
+        if(!root) return
+        dfs(root.left)
+        ret.push(root)
+        dfs(root.right)
+    }
+    dfs(root);
+
+    // 移动两个值，使得数组 ret 单增
+    // 另开一个数组 ret2，排序
+    let sorted = ret.map(item => item.val)
+    sorted.sort((a,b)=> a-b)
+    sorted.forEach((sorted,index) => {
+        if(sorted !== ret[index].val) {
+            ret[index].val = sorted
+        }
+    })
+};
+```
+
+## [222. 完全二叉树的节点个数](https://leetcode-cn.com/problems/count-complete-tree-nodes/submissions/)
+
+直接遍历一次就可以得到节点的数量
+
+```javascript
+var countNodes = function(root) {
+    let ret = 0
+    const preorder =  root => {
+        if(!root) return 
+        ret++
+        preorder(root.left)
+        preorder(root.right)
+    }
+    preorder(root)
+    return ret
+};
 ```
