@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-08-01 10:35:44
- * @LastEditTime: 2021-08-02 09:46:37
+ * @LastEditTime: 2021-08-03 09:04:13
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/基础篇/3.树/中等题 -- 18/README.md
@@ -276,6 +276,94 @@ var countNodes = function(root) {
         preorder(root.right)
     }
     preorder(root)
+    return ret
+};
+```
+
+## [面试题 04.12. 求和路径](https://leetcode-cn.com/problems/paths-with-sum-lcci/solution/shuang-zhi-zhen-shuang-dfs-by-jzsq_lyx-4d6m/)
+
+分析 -- 双 dfs
+1. 起始点不限制，但是路径必须是向下，也就不能倒转网上走
+2. 两个 dfs，一个指向起始节点，一个以起始节点为根节点往下找
+3. 注意1：这里的值是任意值，所以不能用超出值或者取到路径就接续 dfs，而是必须要扫到叶子节点
+4. 时间复杂度 ${O(NlogN)}$ 相当于树中的每一个节点都当了初始节点，然后去遍历子树(find)
+
+```javascript
+var pathSum = function (root, sum) {
+  let ret = 0;
+
+  // 遍历节点的 dfs
+  const dfs = (root) => {
+    if (!root) return;
+    find(root, 0);
+    dfs(root.left);
+    dfs(root.right);
+  };
+
+  const find = (root, total) => {
+    total += root;
+    // if (total > sum) return; // 结束这跳线 -- 这里
+    if (total === sum) {
+      // 符合条件
+      ret++;
+      //   return; 
+    }
+    if (root.left) find(root.left, total);
+    if (root.right) find(root.right, total);
+  };
+
+  dfs(root);
+  return ret;
+};
+
+```
+
+## [129. 求根节点到叶节点数字之和](https://leetcode-cn.com/problems/sum-root-to-leaf-numbers/solution/qian-xu-bian-li-by-jzsq_lyx-ui9b/)
+
+分析：
+1. 这里实际考察的就是按要求从根节点走到叶子节点，而所谓的数字相加只是一种形式
+2. 显然使用前序遍历，每一次先处理根节点的值，然后再处理左右节点的值，符合题意
+3. 时间复杂度 ${O(N)}$
+```javascript
+var sumNumbers = function (root) {
+    let ret = 0
+    const dfs = (root,num) => {
+        let cur = num*10+root.val
+        if(!root.left && !root.right) {
+            // 叶子节点 -- 这里判断有节点才走，主要是为了找到叶子节点，而不是到叶子结点下的 null，这样会重复计算
+            ret+=cur
+        }
+        if(root.left) dfs(root.left,cur)
+        if(root.right) dfs(root.right,cur)
+    }
+
+    dfs(root,0)
+    return ret
+}
+```
+
+## [1448. 统计二叉树中好节点的数目](https://leetcode-cn.com/problems/count-good-nodes-in-binary-tree/solution/qian-xu-bian-li-by-jzsq_lyx-pwwn/)
+
+分析
+1. 将题目转化，在前序遍历过程中，维护一个最大值，如果在整条路径中的最大值小于等于当前节点的值，那么这个节点就是号节点
+2. 只有是好节点的时候，才需要替换最大值，然后遍历完就可以找出所有的号节点
+3. 时间复杂度 ${O(N)}$
+
+
+```javascript
+var goodNodes = function(root) {
+    let ret = 0
+
+    const dfs = (root,max) => {
+        if(root.val>=max) {
+            ret++
+            max = ret
+        }
+        if(root.left) dfs(root.left,max)
+        if(root.right) dfs(root.right,max)
+    }
+
+    dfs(root,-Infinity)
     return ret
 };
 ```
