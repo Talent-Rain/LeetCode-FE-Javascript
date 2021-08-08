@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-08-01 10:35:44
- * @LastEditTime: 2021-08-03 09:04:13
+ * @LastEditTime: 2021-08-08 16:04:56
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/基础篇/3.树/中等题 -- 18/README.md
@@ -9,7 +9,7 @@
 
 
 
-## [1. 二叉树最大宽度](https://leetcode-cn.com/problems/maximum-width-of-binary-tree/solution/wan-quan-er-cha-shu-ji-lu-jie-dian-xia-b-hcsg/)
+## [662. 二叉树最大宽度](https://leetcode-cn.com/problems/maximum-width-of-binary-tree/solution/wan-quan-er-cha-shu-ji-lu-jie-dian-xia-b-hcsg/)
 
 ### 基于完全二叉树的特性
 1. 求宽度，盲猜用层序遍历比较合适，但是啥时候加 null 是个体面活
