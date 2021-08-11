@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-08-09 08:42:44
- * @LastEditTime: 2021-08-10 10:02:36
+ * @LastEditTime: 2021-08-11 09:47:38
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/基础篇/2.Link/README.md
@@ -153,6 +153,7 @@ var reverseList = function (head) {
 1. 从链表尾部阶段 k 长度，拼在前面即可 -- 其中 k = (K %len) ，如果移动了 len 的位置，就又回到了原来的位置了
 2. 需要注意的是一些边界条件，但是这里直接定义 prev 为安全守卫，一切需要保存或者拼接的节点都应用 prev 来处理，就可以避免 cur 为 null 的时候无法获取 next 指针的尴尬，因为 cur 是实际走的指针，prev 只是一个安全守卫，它始终是存在的。
 3. 时间复杂度${O(N)}$
+
 ```javascript
 var rotateRight = function (head, k) {
   // 先求链表的长度
@@ -226,10 +227,12 @@ var deleteDuplicates = function (head) {
 ## [86. 分隔链表](https://leetcode-cn.com/problems/partition-list/solution/cha-ru-he-shan-chu-lian-biao-jie-dian-by-oo1g/)
 
 分析
+
 1.  遍历链表找出值大于等于 x 的第一个节点 K，然这个时候前面那些节点都不用动了，因为都是小于 x 的
 2.  然后从 K 开始找出小于 x 的节点，移动到 K-1 - K 之间的位置即可
 3.  由于存在插入和删除操作，所以需要用到 prev 指针和 cur 指针；由于可能存在第一个节点就是大于等于 x 的 K ，所以需要安全守卫 emptyNode
 4.  时间复杂度 ${O(N)}$
+
 ```javascript
 var partition = function (head, x) {
   let emptyNode = (prev = new ListNode());
@@ -260,35 +263,111 @@ var partition = function (head, x) {
   return emptyNode.next;
 };
 ```
+
 ## [109. 有序链表转换二叉搜索树](https://leetcode-cn.com/problems/convert-sorted-list-to-binary-search-tree/solution/kuai-man-zhi-zhen-zhao-zhong-jian-jie-di-wj50/)
 
- 分析
- 1. 这里说的高度平衡，说人话其实就是尽可能平均的将节点分配到左右子树中，那么找出中间节点，然后平分到左右节点树就是比较合适的解
- 2. 这种设置节点然后最后成树的操作，使用自底向上的思路就很合适，不断二分切割链表，知道只有一个节点的时候就作为叶子节点，然后返回去
- 3. 这里使用快慢指针找到中间节点 slow ， 注意这个节点是向上取中点的，所以就是当前节点的值，然后将前面一段链表分给左树，右边一段链表分给右树
- 4. 这里用到了 BST 中左树节点永远小于根节点小于右侧节点的特性，以及本轮链表就是单增链表的特性
- 5. 时间复杂度 ${O(N)}$ 还是相当于遍历一个完整的链表
-```javascript
- var sortedListToBST = function(head) {
+分析
 
-    const recursion = (head) => {
-        if(!head) return null // 空节点
-        // 使用双指针找出中间节点 -- 这是向上取整
-        let emptyNode = prev = new ListNode()
-        prev.next = head
-        let slow = fast = head
-        while(fast && fast.next) {
-            slow = slow.next
-            fast = fast.next.next
-            prev = prev.next
-        }
-        // 以 slow 为根节点，左侧一段离岸边要截断
-        prev.next = null
-        const node = new TreeNode(slow.val)
-        node.left = recursion(emptyNode.next)
-        node.right = recursion(slow.next)
-        return node
+1.  这里说的高度平衡，说人话其实就是尽可能平均的将节点分配到左右子树中，那么找出中间节点，然后平分到左右节点树就是比较合适的解
+2.  这种设置节点然后最后成树的操作，使用自底向上的思路就很合适，不断二分切割链表，知道只有一个节点的时候就作为叶子节点，然后返回去
+3.  这里使用快慢指针找到中间节点 slow ， 注意这个节点是向上取中点的，所以就是当前节点的值，然后将前面一段链表分给左树，右边一段链表分给右树
+4.  这里用到了 BST 中左树节点永远小于根节点小于右侧节点的特性，以及本轮链表就是单增链表的特性
+5.  时间复杂度 ${O(N)}$ 还是相当于遍历一个完整的链表
+
+```javascript
+var sortedListToBST = function (head) {
+  const recursion = (head) => {
+    if (!head) return null; // 空节点
+    // 使用双指针找出中间节点 -- 这是向上取整
+    let emptyNode = (prev = new ListNode());
+    prev.next = head;
+    let slow = (fast = head);
+    while (fast && fast.next) {
+      slow = slow.next;
+      fast = fast.next.next;
+      prev = prev.next;
     }
-    return recursion(head)
+    // 以 slow 为根节点，左侧一段离岸边要截断
+    prev.next = null;
+    const node = new TreeNode(slow.val);
+    node.left = recursion(emptyNode.next);
+    node.right = recursion(slow.next);
+    return node;
+  };
+  return recursion(head);
+};
+```
+
+## [142. 环形链表 II](https://leetcode-cn.com/problems/linked-list-cycle-ii/solution/kuai-man-zhi-zhen-mou-xie-te-shu-shu-xue-a9vm/)
+
+分析
+
+1. 相比于 [141. 环形链表](https://leetcode-cn.com/problems/linked-list-cycle/) 不但要判断是否有环，还得算出入环的那个节点
+2. 这里进行的一系列计算，都必须保证起点是一样的，这样才能保证走出来的路径长度是适合的。
+3. 画图可得，将起始点到环起点记作 l , 环长 r, 快慢指针相交的点距离环起点为 s, 由于快指针是慢指针速度的 2 倍,根据速度一定可以得到等式 s = (n-2m)r-l 其中 n,m 是快慢指针走的环的圈数量，这两个变量不重要，只需要表示他们分别走了 n, m 圈后相交了
+4. 这个时候我们发现如果原来的慢指针继续走到环节点，需要走的路程是 (r-s) = (1-n+2m)r+l ;这个时候我们在起始点重新开启一个新的慢节点 newSlow, 让他们一起走一段路 l, 他们切好在起点相遇
+5. 时间复杂度 ${O(N)}$
+
+```javascript
+var detectCycle = function (head) {
+  if (!head) return null; //一个节点都没得，还有啥环
+  const emptyNode = new ListNode();
+  emptyNode.next = head;
+  let slow = (fast = emptyNode); // 相当于走了走了一次了
+  while (fast && fast.next) {
+    // 一开始都是从边界守卫开始，这样可以防止在第一个节点就有环了
+    slow = slow.next;
+    fast = fast.next.next;
+    if (slow === fast) {
+      // 在环中的某一个点相交了
+      let newSlow = emptyNode;
+      while (slow !== newSlow) {
+        newSlow = newSlow.next;
+        slow = slow.next;
+      }
+
+      return newSlow;
+    }
+  }
+  return null; //如果会跳出来，证明无环
+};
+```
+
+## [147. 对链表进行插入排序](https://leetcode-cn.com/problems/insertion-sort-list/solution/du-xie-zhi-zhen-cha-ru-pai-xu-by-jzsq_ly-sj9d/)
+
+分析
+
+1. 编辑读写指针，write 指针前是排好序的链表，即它的是前面链表的最大值
+2. read 指针遇到比 write 指针值大于等于的节点，则 write 指针跟着移动；遇到小于 read 的指针，删除节点并在 write 指针前找到一个合适的位置插入
+3. 时间复杂度 ${O(nlogn)}$
+
+```javascript
+var insertionSortList = function (head) {
+  if (!head || !head.next) return head;
+  let emptyNode = new ListNode();
+  emptyNode.next = head;
+  let write = head,
+    read = head.next;
+  while (read) {
+    if (read.val >= write.val) {
+      // 读指针比写指针更大的时候，一起走
+      read = read.next;
+      write = write.next;
+    } else {
+      // 删除 read 指针，然后从 emptyNode 到 write 中找个位置插入
+      // 先删除 -- 这个时候 read 指针先当做一个普通节点使用,注意: write 指针其实一直都在 read 之后，和 prev 指针的作用差不多
+      write.next = read.next;
+      let em = emptyNode;
+      while (em.next.val < read.val) {
+        em = em.next;
+      }
+      // 插入 em.next >= read.val , 所有插入到 em - read - em.next
+      read.next = em.next;
+      em.next = read;
+      // 把 read 指针放回到 write 之后，再继续走 -- 这里当然可以用临时遍历处理，但是
+      read = write.next;
+    }
+  }
+  return emptyNode.next;
 };
 ```
