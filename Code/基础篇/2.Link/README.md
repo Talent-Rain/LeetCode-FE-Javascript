@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-08-09 08:42:44
- * @LastEditTime: 2021-08-11 09:47:38
+ * @LastEditTime: 2021-08-12 09:57:39
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/基础篇/2.Link/README.md
@@ -370,4 +370,152 @@ var insertionSortList = function (head) {
   }
   return emptyNode.next;
 };
+```
+
+## [328. 奇偶链表](https://leetcode-cn.com/problems/odd-even-linked-list/solution/kuai-man-zhi-zhen-by-jzsq_lyx-76r8/)
+分析
+1. 这里的奇偶性是排序奇偶性，类比数组的下标的奇偶性，而并非是值的奇偶性
+2. 原地转移且要保持奇偶节点的相对顺序，也就是不能直接将奇偶节点交换位置，只能插入： 1-2-3-4-5 只能是 1-3-5-2-4 而不能是 1-3-5-4-2
+3. 仍然使用快慢指针，快指针从初始位置启动，每次走 2 步，也就是说 fast 指针指向奇数节点，slow 指针指向匹配好全奇的尾结点
+4. 每次将 fast 节点删除，然后插入到 slow 节点之后，由于整体长度是不变的，所以 fast 节点删除后要保持在奇数位置，就得设在临时的 prev 节点上
+```javascript
+ var oddEvenList = function(head) {
+    if(!head || !head.next) return head // 两个节点都没得，直接回家吧
+    let emptyNode = new ListNode()
+    emptyNode.next = head
+    let fast = slow = head
+    while(fast && fast.next){
+        // 这是fast的前一个节点，用来删除 fast 节点 -- 同时作为在前面插入删除节点后，重新锚点的位置
+        const prev = fast.next
+        fast = fast.next.next
+        if(fast) {
+            // 删除 fast 节点
+            prev.next = fast.next
+            fast.next =   slow.next
+            slow.next = fast
+            slow = slow.next
+            // 恢复 fast
+            fast = prev
+        }
+    }
+    return emptyNode.next
+};
+```
+
+## [160. 相交链表](https://leetcode-cn.com/problems/intersection-of-two-linked-lists/solution/shuang-zhi-zhen-qiu-xiang-deng-chang-du-o1rih/)
+
+### 分析
+1. 长度不一样的链表，肯定不会在起始节点就相交，这是必然，所谓相交链表，就是这个子链表是完全一样的，可以假设有 a,b,c 三个链表，然后 a,b 的尾结点同时指向 c, 即 aTail.next = c , bTail.next = c ，这个时候形成的新的链表 headA 和 headB 的相交链表就是 c
+2. 需要注意的是， aTail 和 bTail 可能会存在值相等，但是实际缺不是一个节点的情况，但是在 LC 的链表序列化中以数组的形式存在，就会迷惑为什么不是在 aTail 这个节点就是相交节点，需要`特别注意`
+3. 所以我们一起走两个链表，直到其中一个结束，找出可能剩下没走完的那个链表，就可以判断除 long 长链表和 short 短链表, 以及剩余未走的链表 tempC，如何让 long 和 tempC 一起走完，这个时候 long 和 short 长度就一致了，可以开始判断相交性
+
+```javascript
+var getIntersectionNode = function(headA, headB) {
+    let tempA = headA, tempB = headB
+    while(tempA && tempB){
+        // 一起走
+        tempA= tempA.next
+        tempB= tempB.next
+    }
+    // tempC 是剩下的， long 是更长的链表
+    if(tempA){
+        tempC = tempA 
+        long = headA
+        short = headB
+    }else{
+        tempC = headB 
+        long = headB
+        short = headA 
+    }
+    // 将 long 多出来的节点先走完，得到和 short 相同长度的链表
+    while(long){
+        while(tempC){
+            tempC= tempC.next
+            long= long.next
+        }
+    }
+    while(long){
+        if(long === short) return long
+        long =long.next
+        short =short.next
+    }
+    return null
+};
+
+```
+
+### 分析 -- 压缩一下
+1. 原理基本是一致的，都是用临时变量分辨走 headA 和 headB， 然后判断是否存在相同的点，如果最后走完了还没有，则返回 null -- 目标就是实现两个长度相等的链表，再比较
+2. 如果 headA 和 headB 长度一致，那么一开始就遍历两个链表，并找出是否相交，如果相交则跳出循环，返回相交节点；如果没有相交节点，则一起走到 null，也跳出循环，返回 null
+3. 如果 headA 和 headB 长度不一致,那么就先一起遍历结束，短链表变量 A 切换到长链表 long，继续和剩下的原长链表多出的表走，直到长链表变量 B 切换到短链表 short，此时变量 A,B 对应的链表长度已经相等，继续遍历，然后进行步骤 2 的判断
+4. 时间复杂度 ${O(n+m)}$
+```javascript
+var getIntersectionNode = function(headA, headB) {
+    let tempA = headA, tempB = headB
+    while(tempA!==tempB){
+        tempA = tempA?tempA.next:headB
+        tempB = tempB?tempB.next:headA
+    }
+    return tempA
+}
+```
+
+
+
+## [1721. 交换链表中的节点](https://leetcode-cn.com/problems/swapping-nodes-in-a-linked-list/solution/shuang-zhi-zhen-qiu-jie-dian-shan-chu-ch-l4w5/)
+
+分析
+1. 先用双指针求出正序第k个节点 first 和反序第k个节点 second
+2. 现在要交换 first 和 second ， 需要先判断他们两个节点是不是相邻，相邻节点可以直接处理
+3. 如果不是相邻节点，那么就用删除插入的方法，将两个节点进行交换
+4. 注意: 当 first 和 second 求到之后，直接将里面的 val 值修改，在 leetcode 上是可以走通的，但是这其实是不符合题意的，这就和[相交链表](https://leetcode-cn.com/problems/intersection-of-two-linked-lists/solution/shuang-zhi-zhen-qiu-xiang-deng-chang-du-o1rih/) 中的迷惑一样，为什么 a2 节点值明明一样，但是相交节点缺是 a3 是一样的；交换了值，但是节点在存储位置是不变的，所以真是节点并没有改变，这算是 LC 在这题中 ，边界设计有问题吧
+5. 对于 JS 来说，我们一般可以用对象来模拟链表的节点，从这个方面看，每个节点都是单独的对象，里面有一个属性 val，我们声明了两个对象，val 是一样的，但是他们却是不同的对象，因为他们在内存中存储的位置是完全不一样的。
+
+```javascript
+
+var swapNodes = function (head, k) {
+  if (!head) return head;
+  let emptyNode = new ListNode();
+  emptyNode.next = head;
+  let pFirst = emptyNode;
+  let first = head;
+  while (--k) {
+    first = first.next;
+    pFirst = pFirst.next;
+  }
+  // 现在 first 就是正向第 k 个节点,只需要保存
+
+  let temp = first.next;
+  let pSecond = emptyNode;
+  let second = head;
+  while (temp) {
+    temp = temp.next;
+    pSecond = pSecond.next;
+    second = second.next;
+  }
+  // 这个时候 second 就是反向第 K 个节点
+
+  if (first.next === second) {
+    // 相邻节点交换
+    pFirst.next = second;
+    first.next = second.next;
+    second.next = first;
+  } else if (second.next === first) {
+    // 相邻节点交换
+    pSecond.next = first;
+    second.next = first.next;
+    first.next = second;
+  } else {
+    // 交换 first 和 second
+    const fNext = first.next;
+    const sNext = second.next;
+    pFirst.next = second;
+    pSecond.next = first;
+    second.next = fNext;
+    first.next = sNext;
+  }
+
+  return emptyNode.next;
+};
+
 ```
