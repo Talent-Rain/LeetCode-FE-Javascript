@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-08-09 08:42:44
- * @LastEditTime: 2021-08-12 09:57:39
+ * @LastEditTime: 2021-08-14 07:28:35
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/基础篇/2.Link/README.md
@@ -232,6 +232,8 @@ var deleteDuplicates = function (head) {
 2.  然后从 K 开始找出小于 x 的节点，移动到 K-1 - K 之间的位置即可
 3.  由于存在插入和删除操作，所以需要用到 prev 指针和 cur 指针；由于可能存在第一个节点就是大于等于 x 的 K ，所以需要安全守卫 emptyNode
 4.  时间复杂度 ${O(N)}$
+
+> 注意：[面试题 02.04. 分割链表](https://leetcode-cn.com/problems/partition-list-lcci/) 这道题和本题类似，但是不保留每个分区的初始相对位置
 
 ```javascript
 var partition = function (head, x) {
@@ -515,6 +517,207 @@ var swapNodes = function (head, k) {
     first.next = sNext;
   }
 
+  return emptyNode.next;
+};
+
+```
+
+
+## [725. 分隔链表](https://leetcode-cn.com/problems/split-linked-list-in-parts/solution/bao-li-qiu-chu-ge-ge-qie-ge-zi-chuan-by-44ddp/)
+
+分析
+1. 两个关键点，每一个部分尽可能平均，前面的链表长度大于后面的链表长度
+2. 直接计算出链表长度，取除数可以得到最短长度 n，取余可以知道前面 m 个链表的长度要为 n+1
+3. 再一次遍历链表，使用读写指针分割好，保存到数组中
+
+```javascript
+var splitListToParts = function(head, k) {
+    if(!head) return new Array(k).fill(null) // 没有节点也要切，只是切成 k 份的 null
+    let emptyNode = new ListNode
+    emptyNode.next = head
+    let temp = head
+    let len = 0
+    while(temp){
+        len++;
+        temp =temp.next
+    }
+    const n = Math.floor(len/k)
+    let m = len % k // 前 m 个链表取 n+1 个值
+    let write = read = head 
+    let ret = []
+    let other = k - m
+    // 插入 m 个 n+1 的链表
+    while(m--){
+        let count = 0
+        //前 m 个值,最少都还有一个值
+        while(count < n){
+            read = read.next
+            count++
+        } 
+        // 此时 read 指针在切割指针的位置
+        const next = read.next
+        read.next = null //切割
+        ret.push(write)
+        write = next
+        read = next
+    }
+    // 再插入 k-m 个 n 长度的链表
+    while(other --){
+        if(n === 0) {
+            ret.push(null)
+        }else{
+            let count = 0
+            while(count < n-1){
+                read = read.next
+                count++
+            } 
+            // 此时 read 指针在切割指针的位置
+            const next = read.next
+            read.next = null //切割
+            ret.push(write)
+            write = next
+            read = next
+        }
+    }
+    return ret
+
+};
+```
+
+## [817. 链表组件](https://leetcode-cn.com/problems/linked-list-components/solution/zheng-chang-shi-bian-li-by-jzsq_lyx-puov/)
+
+分析
+1. 这里说明了 head 中的值都是唯一的，且 nums 中的值都是 haed 值中的子集，所以可以另开一个 [0,N-1] 的数组，将 nums 的值作为下标放进去
+2. 这样就可以直接用数组下标判断head 中的值是否包含在 nums 中，且复杂度为 ${O(1)}$
+3. 最后返回值是有多少个组件，也就是一旦断开链表，组件数量就加一
+4. 时间复杂度 ${O(N)}$ ; 空间复杂度 ${O(N)}$
+```javascript
+
+var numComponents = function (head, nums) {
+  const arr = [];
+  for (let num of nums) {
+    arr[num] = 1;
+  }
+  let len = nums.length;
+  let ret = 0;
+  let count = 0; //每一个组件的长度 -- 必须大于 1 才能组成一个组件
+  while (head && len) {
+    if (arr[head.val]) {
+      // nums 的值在减少，一旦为 0 了，就结束遍历了
+      count++; // 万一需要求最大组件，就可以用这个 count 了
+      len--;
+    }
+    if (count && !arr[head.val]) {
+      // 处于匹配状态，但是这一次却没有匹配值
+      ret++;
+      count = 0; // 恢复到 0, 继续下一次的匹配
+    }
+    head = head.next;
+  }
+  return count ? ret + 1 : ret; //弹出遍历时如果还存在有匹配的组件没计算，则再加1
+};
+```
+
+## [707. 设计链表](https://leetcode-cn.com/problems/design-linked-list/solution/shu-zu-mo-ni-lian-biao-by-jzsq_lyx-gimw/)
+
+分析
+1. 既然是设计题，而且设计的是链表，那么自然而然想起与之相对应的数组，所以这里是用数组类模拟链表的
+2. 这里设计了获取链表第 k 个值，添加头，添加尾，添加 index 位置的节点以及删除第 index 节点的 api
+3. 按要求设计即可，注意边界即可；
+```javascript
+/**
+ * @分析
+ * 1. 这里是用数组来模拟链表
+ */
+var MyLinkedList = function () {
+  this.data = [];
+};
+
+/**
+ * @分析 -- 获取第 index 个节点的值
+ * 1. 这里的 index 类比数组的下标值，是从 0 开始的，也就是 index 为 0 代表头节点
+ * 2. 这里是获取第 index 个节点的值，如果没有这个 index，即 index 超出链表长度 len-1，返回 -1
+ */
+MyLinkedList.prototype.get = function (index) {
+  const size = this.data.length;
+  return index < size ? this.data[index] : -1;
+};
+
+/**
+ * @分析 -- 从头部插入一个链表值
+ */
+MyLinkedList.prototype.addAtHead = function (val) {
+    this.data.unshift(val)
+};
+
+/**
+ * @分析 -- 从尾部插入一个链表值
+ */
+MyLinkedList.prototype.addAtTail = function (val) {
+    this.data.push(val)
+};
+
+/**
+ * @分析 -- 从 index 插入一个值
+ */
+MyLinkedList.prototype.addAtIndex = function (index, val) {
+    const len = this.data.length
+    if(index<=len){
+        if (index <= 0) {
+            this.data.unshift(val)
+        } else if (index === len) {
+            this.data.push(val)
+        } else{
+            this.data.splice(index, 0, val) //在 index 节点删除 0 个值，并加入 val
+        }
+    }
+};
+
+/**
+ * @分析 -- 删除第 index 个值
+ */
+MyLinkedList.prototype.deleteAtIndex = function (index) {
+    const len = this.data.length
+    if(index>=0 && index<len){
+        this.data.splice(index,1)
+    }
+};
+
+
+```
+
+## [1171. 从链表中删去总和值为零的连续节点](https://leetcode-cn.com/problems/remove-zero-sum-consecutive-nodes-from-linked-list/solution/shuang-lian-biao-zhi-zhen-bian-li-by-jzs-536b/)
+
+分析 -- 暴力解法
+1. 直接两个循环遍历链表，得到所有链表组合的和，遇到 0 的，刷新外层指针的 next ，达到删除的效果
+2. 类比于数组，相当于将数组中和为0的连续子数组删除，得到剩下的数组，所以可以开两个循环，动态获取数组的长度，一旦遇到符合要求的数组，就删除，直到外层遍历结束为止
+3. 画图会比较容易看到，值得注意的是，一定要有一个指针 outer 从 head -> tail , 然后每一次都有临时指针 inner 从 outer.next 开始走到 tail
+4. 最差就不需要删除，所以要走 1+2+3+...n = ${O(N^2)}$
+
+```javascript
+var removeZeroSumSublists = function (head) {
+  let emptyNode = new ListNode();
+  emptyNode.next = head;
+  let sum = 0;
+  let outer = emptyNode;
+  while (outer) {
+    let inner = outer.next;
+    while (inner) {
+      // 每次都由 inner 来判断是否要删除相应的链表
+      // outer 相当于是外围的一个 prev 指针，一旦某一个链表需要删除，直接 outer.next = 删除节点的下一个节点 即可
+      sum += inner.val;
+      inner = inner.next;
+      if (sum === 0) {
+        // outer -> inner 的节点都要删除
+        outer.next = inner;
+        sum = 0; //返回
+      }
+    }
+    // outer 也需要不断遍历到 tail
+    outer = outer.next;
+    // 每一次遍历时，临时总和要重置
+    sum = 0;
+  }
   return emptyNode.next;
 };
 
