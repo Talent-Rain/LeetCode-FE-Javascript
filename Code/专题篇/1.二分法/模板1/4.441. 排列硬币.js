@@ -1,3 +1,4 @@
+
 // 441. 排列硬币
 
 /**
@@ -10,19 +11,20 @@
  * 6. 时间复杂度${O(logN)}$
  */
  var arrangeCoins = function (n) {
-  let left = 0,
-    right = n;
-  while (left <= right) {
-    const mid = left + ((right - left) >> 1);
-    // mid 层的时候满的硬币数
-    const sum = ((1 + mid) * mid) / 2;
-    if (sum === n) return mid;
-    if (sum < n) {
-      left = mid + 1;
-    } else {
-      right = mid - 1;
+    let left = 0,
+      right = n;
+    while (left <= right) {
+      const mid = left + ((right - left) >> 1);
+      // mid 层的时候满的硬币数
+      const sum = ((1 + mid) * mid) / 2;
+      if (sum === n) return mid;
+      if (sum < n) {
+        left = mid + 1;
+      } else {
+        right = mid - 1;
+      }
     }
-  }
-  return right
-};
-
+    return right
+  };
+  
+  
