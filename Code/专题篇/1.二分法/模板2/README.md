@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-08-15 11:07:09
- * @LastEditTime: 2021-08-15 11:36:14
+ * @LastEditTime: 2021-08-18 09:30:14
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/专题篇/1.二分法/模板2/README.md
@@ -83,5 +83,70 @@ var findPeakElement = function (nums) {
     }
   }
   return left;
+};
+```
+
+### [153. 寻找旋转排序数组中的最小值](https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array/solution/er-fen-by-jzsq_lyx-2fu8/)
+
+分析
+1. 这里其实就是找谷值，注意的是，这里的值互不相等且局部单增 ，所以可以加一个辅助条件 nums[-1] = nums[len] = infinite,这样能保证谷值在边缘也能直接找到
+2. 注意：这里返回的是最小值，而不是最小坐标
+3. 注意取得 mid 值之后，将 mid 与 right 的值比较，只会出现两种情况，
+  - 如果 nums[mid]<=nums[right] ，则 mid 和 right 重合或 mid 在 right 之后且单增，这个时候无论是在第一个单增区间还是第二个，谷点都在 mid 之钱，所以 right = mid-1
+
+```javascript
+var findMin = function (nums) {
+  let len = nums.length;
+  nums[-1] = nums[len] = Infinity;
+  let left = 0,
+    right = len - 1;
+
+  while (left <= right) {
+    const mid = ((right - left) >> 1) + left;
+
+    if (nums[mid - 1] > nums[mid] && nums[mid] < nums[mid + 1])
+      return nums[mid]; //谷值
+
+    if(nums[mid]<=nums[right]){
+        // [mid,right] 单增
+        // 注意这个等号为啥要加，可以考虑一下如果 left 和 right 相等时，对应的 mid 也是这个点，那么是让 right 走，还是让 left 走；这里我们最后返回值是 left,所以让 right 走一步结束战斗
+        right = mid-1
+    }else{
+        left = mid+1
+    }
+  }
+
+  return nums[left];
+};
+
+```
+
+### [154. 寻找旋转排序数组中的最小值 II](https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array-ii/submissions/)
+- 和 [153. 寻找旋转排序数组中的最小值](https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array/solution/er-fen-by-jzsq_lyx-2fu8/) 类似，但是由于值可以重复，无法直接判断单增区间
+- 所以想办法将右侧与 mid 相等的值先删除掉，这个时候剩下的不同值可以与 153 题一样做处理了
+```javascript
+var findMin = function(nums) {
+    const len  = nums.length
+    nums[-1] = nums[len] = Infinity
+    let left = 0,right = len-1
+    while(left<=right){
+        const mid = ((right-left)>>1) + left
+
+        // 将右侧与 mid 同值的值删掉
+        while(nums[right] === nums[mid] && right>mid){
+            right -- 
+        }
+        // 由于存在重复值，所以拐点值右侧可以是直线，而不一定是单增
+        if(nums[mid-1]>nums[mid] && nums[mid]<=nums[mid+1]) return nums[mid]
+
+        if(nums[mid]<=nums[right]){
+            // 上一题这里的等号是当 left 和 right 重合时的特殊情况
+            // 现在由于值可能重复，所以不能直接判断出 [mid,right] 是递增的区间了，所以要先为右侧相同的值进行删减，然后再进行即可
+            right = mid-1
+        }else{
+            left = mid+1
+        }
+    }
+    return nums[left]
 };
 ```
