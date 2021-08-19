@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-08-17 09:45:05
- * @LastEditTime: 2021-08-19 09:15:28
+ * @LastEditTime: 2021-08-19 09:44:00
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/专题篇/1.二分法/其他练习/README.md
@@ -125,7 +125,7 @@ var intersection = function (nums1, nums2) {
 ```
 
 
-### [5.350. 两个数组的交集 II](https://leetcode-cn.com/problems/intersection-of-two-arrays-ii/submissions/)
+### [350. 两个数组的交集 II](https://leetcode-cn.com/problems/intersection-of-two-arrays-ii/submissions/)
 
 - 直接用 map 将其中一个数组的值映射保存起来
 - 然后遍历另外的数组，每一次匹配成功，则map 的值减一，ret 数组 push 上这个值
@@ -152,3 +152,29 @@ var intersect = function (nums1, nums2) {
   return ret;
 };
 ```
+
+### [167. 两数之和 II - 输入有序数组]()
+分析
+1. numbers 是升序数组，找出 n1+n2 = target , 返回 n1,n2 对应的下标值 [i1,i2] -- 注意下标值从 1 开始
+2. 每个输入只有唯一的输出值
+3. 时间复杂度 ${nlogn}$
+```javascript
+var twoSum = function (numbers, target) {
+  for (let i = 0; i < numbers.length-1; i++) {
+    const temp = target - numbers[i];
+    let l = i + 1,
+      r = numbers.length - 1;
+    while (l <= r) {
+      const mid = ((r - l) >> 1) + l;
+      if (numbers[mid] === temp) return [i + 1, mid + 1];
+      if (numbers[mid] < temp) {
+        left = mid + 1;
+      } else {
+        right = mid - 1;
+      }
+    }
+  }
+};
+```
+
+
