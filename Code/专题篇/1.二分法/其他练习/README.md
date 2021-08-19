@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-08-17 09:45:05
- * @LastEditTime: 2021-08-18 09:25:53
+ * @LastEditTime: 2021-08-19 09:15:28
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/专题篇/1.二分法/其他练习/README.md
@@ -84,3 +84,71 @@ var isPerfectSquare = function (num) {
     return letters[left]
 
 };
+```
+
+
+### [349. 两个数组的交集](https://leetcode-cn.com/problems/intersection-of-two-arrays/submissions/)
+
+分析：
+1. 先为 nums1 和 nums2 排序，然后遍历其中一个数组，另外一个数组做二分查找，最后得到结果
+2. 这里直接取nums1 做遍历，实际可以找个长度少的遍历，长度大的做二分，这样查找过程的时间复杂度即为 ${O(nlogm)}$, 其中 n<=m
+3. 但是由于做了排序，实际的时间复杂度是 ${mlogm}$ m 是大的那个长度
+```javascript
+var intersection = function (nums1, nums2) {
+  const l1 = nums1.length,
+    l2 = nums2.length;
+  if (!l1 || !l2) return [];
+  // 先排序
+  nums1.sort((a, b) => a - b);
+  nums2.sort((a, b) => a - b);
+  const ret = [];
+  for (let i = 0;i<l1;i++) {
+      if(i>0 && nums1[i-1] === nums1[i]) continue // 重复值跳过
+      const n = nums1[i];
+    let left = 0,
+      right = l2-1;
+    while (left <= right) {
+      const mid = ((right - left) >> 1) + left;
+      if (nums2[mid] === n) {
+        ret.push(n);
+        break;
+      }
+      if (nums2[mid] > n) {
+        right = mid - 1;
+      } else {
+        left = mid + 1;
+      }
+    }
+  }
+  return ret
+};
+```
+
+
+### [5.350. 两个数组的交集 II](https://leetcode-cn.com/problems/intersection-of-two-arrays-ii/submissions/)
+
+- 直接用 map 将其中一个数组的值映射保存起来
+- 然后遍历另外的数组，每一次匹配成功，则map 的值减一，ret 数组 push 上这个值
+- 直到 map 中的这个值为 0，则这个值在两个数组中的最大公约数达到，不再进行 push 咯
+- 时间复杂度 ${O(n+m)}$ , 空间复杂度 ${O(n)}$ 其中 n 可以是小的那个数组的不同值长度
+```javascript
+var intersect = function (nums1, nums2) {
+  const map = new Map(); //将长数组的值存储一份
+  for (let item of nums2) {
+    if (map.has(item)) {
+      map.set(item, map.get(item) + 1);
+    } else {
+      map.set(item, 1);
+    }
+  }
+  let ret = [];
+  for(let item of nums1){
+      if(!!map.get(item)){
+          map.set(item,map.get(item)-1)
+          ret.push(item)
+      }
+  }
+
+  return ret;
+};
+```
