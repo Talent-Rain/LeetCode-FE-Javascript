@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-08-17 09:45:05
- * @LastEditTime: 2021-08-21 22:58:48
+ * @LastEditTime: 2021-08-22 08:44:28
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/专题篇/1.二分法/其他练习/README.md
@@ -153,7 +153,7 @@ var intersect = function (nums1, nums2) {
 };
 ```
 
-### [167. 两数之和 II - 输入有序数组]()
+### [167. 两数之和 II - 输入有序数组](https://leetcode-cn.com/problems/two-sum-ii-input-array-is-sorted/)
 分析
 1. numbers 是升序数组，找出 n1+n2 = target , 返回 n1,n2 对应的下标值 [i1,i2] -- 注意下标值从 1 开始
 2. 每个输入只有唯一的输出值
@@ -203,7 +203,7 @@ var findDuplicate = function (nums) {
 };
 ```
 
-## [4.寻找两个正序数组的中位数](https://leetcode-cn.com/problems/median-of-two-sorted-arrays/solution/xun-zhao-liang-ge-you-xu-shu-zu-de-zhong-wei-s-114/)
+### [4.寻找两个正序数组的中位数](https://leetcode-cn.com/problems/median-of-two-sorted-arrays/solution/xun-zhao-liang-ge-you-xu-shu-zu-de-zhong-wei-s-114/)
 
 分析
 1. 已知两个有序数据，求中位数 （和求第 k 小没啥区别）
