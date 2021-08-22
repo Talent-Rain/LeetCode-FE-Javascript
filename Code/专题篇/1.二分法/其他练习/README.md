@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-08-17 09:45:05
- * @LastEditTime: 2021-08-19 09:44:00
+ * @LastEditTime: 2021-08-21 22:58:48
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/专题篇/1.二分法/其他练习/README.md
@@ -177,4 +177,119 @@ var twoSum = function (numbers, target) {
 };
 ```
 
+### [287. 寻找重复数](https://leetcode-cn.com/problems/find-the-duplicate-number/solution/er-fen-by-jzsq_lyx-5lbc/)
 
+分析
+1. 给定长度为 n+1 的 nums，里面的值都是 1-n, 本题中只有一个值是重复的，找出这个值
+2. 注意这里只是表明重复的只有一个值，但是这个值重复多少次并没有说明，所以不能用简单的异或二进制处理
+3. 但是我们可以选定以 mid 值，然后判断小于等于 mid 值 count，如果 count 超出了 mid ，证明在 [1,mid] 中至少有一个值重复了，这个时候可以砍掉右侧部分
+4. 当 left 和 right 相等之后，即找到了唯一重复的值，因为这个时候左右两侧的值都不服要求，就只有这个了
+5. 时间复杂度 ${O(nlohn)}$, 空间复杂度 ${1}$
+```javascript
+var findDuplicate = function (nums) {
+  let left = 1,
+    right = nums.length - 1; // 值是 1 - n
+    while (left < right) {
+    const mid = ((right - left) >> 1) + left;
+    const count = nums.reduce((prev, cur) => (cur <= mid ? prev + 1 : prev), 0); // 小于等于 count 的值
+    if (count > mid) {
+      // 如果 [1,mid] 这个数组满值的情况才只有 mid 个，现在 count 如果比这个还大，证明重复的值在这里面
+      right = mid;
+    } else {
+      left = mid + 1;
+    }
+  }
+  return left;
+};
+```
+
+## [4.寻找两个正序数组的中位数](https://leetcode-cn.com/problems/median-of-two-sorted-arrays/solution/xun-zhao-liang-ge-you-xu-shu-zu-de-zhong-wei-s-114/)
+
+分析
+1. 已知两个有序数据，求中位数 （和求第 k 小没啥区别）
+2. 根据两个数组的大小，将题转成求第 k 小的题目
+3. 这题使用二分没能直接过，判定条件边界很多，最后放弃直接用二分处理掉了
+
+
+```javascript
+var findMedianSortedArrays = function (nums1, nums2) {
+  const n = nums1.length,
+    m = nums2.length;
+  let sum = n + m; // 如果是偶数，取两个值 prev,cur ,取中间值
+  let k = (sum + 1) / 2; // 可以是非整数
+  let cur;
+  while (k >= 1) {
+    if (!nums1.length) {
+      cur = nums2.shift();
+    } else if (!nums2.length) {
+      cur = nums1.shift();
+    } else {
+      if (nums1[0] <= nums2[0]) {
+        cur = nums1.shift();
+      } else {
+        cur = nums2.shift();
+      }
+    }
+    k--;
+  }
+  let next;
+  if (k !== 0) {
+    // 这里用 ?? 而不是用 || , 是因为判断 nums[0] 是否为 undefined，而如果是 0 的时候，取 0 而非切换到  Infinity;
+    next = Math.min(nums1[0] ?? Infinity, nums2[0] ?? Infinity);
+    return (cur + next) / 2;
+  }
+  return cur;
+};
+```
+
+### [410. 分割数组的最大值](https://leetcode-cn.com/problems/split-array-largest-sum/solution/er-fen-by-jzsq_lyx-l81g/)
+
+分析
+1. 切分数组 nums，使得切割后数组和最大的那个值最小 -- 子数组是连续的；
+2. 也就是尽可能按照总和均匀的将值分配到每一个数组中，且每个数组中最少有一个值,所以最小值应该就是 max(nums[i]), 最大值是 sum(nums)
+3. 设计一个函数 check(max), 判断是否能切割出 m 个连续子数组，且值小于等于 max；如果可以，证明这个是一个较大值，可以继续向左侧逼近，找到一个更小的值；如果不可以，证明这个值 max 偏小了，需要求的值在右侧.
+4. 这里最需要注意的是，切割的子组件是连续的；同时每一个数组至少有一个值；
+5. 只要捋清楚 check 这个函数，基本就能每次都切掉一半，直接拿到最后值了；
+```javascript
+ var splitArray = function (nums, m) {
+    //    先找到 left 和 right
+    let left = 0,
+      right = 0;
+    for (let num of nums) {
+      left = Math.max(num, left);
+      right += num;
+    }
+      //  切割最大值不超过 max 的数组，如果切出来的数组数量少于 m，则证明可以切得更新，发挥 true
+    // 如果切除来的数组数量超出了 m, 证明只且 m 组的时候，最小值要超出 max 了，返回 false
+    function check(max) {
+      let ret = 0,
+        sum = 0;
+      let i = 0;
+      while (i < nums.length) {
+        sum += nums[i];
+        if (sum >max) {
+        // 一旦超出 max，则分组结束，sum 重新设置为 nums[i]
+          ret++;
+          sum = nums[i];
+        }
+        i++
+      }
+    //   如果最后还有剩，单独成团
+      ret = sum ? ret + 1 : ret;
+      return ret<=m
+    }
+    while (left <= right) {
+      const mid = ((right - left) >> 1) + left;
+      if (check(mid)) {
+        //   如果能找到，向左逼近 -- right 最后得到的是一个不成功的值，因为只要成功它就要发生改变
+        right = mid - 1;
+      } else {
+        //  left 最终出去的时候，肯定代表一个成功的值
+        left = mid + 1;
+      }
+    }
+  
+    return left;
+  };
+
+```
