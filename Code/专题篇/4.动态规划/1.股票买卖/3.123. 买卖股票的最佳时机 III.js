@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-08-24 09:23:31
- * @LastEditTime: 2021-08-24 10:00:48
+ * @LastEditTime: 2021-08-25 08:05:48
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/专题篇/4.动态规划/01.股票买卖/3.123. 买卖股票的最佳时机 III.js
@@ -27,7 +27,7 @@ var maxProfit = function (prices) {
         for(let k = 1;k<=2;k++){
             // base case 1 -- 当 k 为 0 时
             dp[i][0][0]  = 0
-            dp[i][1][0] = -Infinity
+            dp[i][1][0] = 0
             if(i === 0){
                 // base case 2 -- 第一天时的状态 
                 dp[0][0][k]  = 0

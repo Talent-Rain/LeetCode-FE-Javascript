@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-08-24 09:13:57
- * @LastEditTime: 2021-08-25 07:45:08
+ * @LastEditTime: 2021-08-25 08:37:15
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/专题篇/4.动态规划/01.股票买卖/README.md
@@ -98,3 +98,83 @@ var maxProfit = function (prices) {
 }
 ```
 
+### [188. 买卖股票的最佳时机 IV](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iv/)
+
+1. 和[123. 买卖股票的最佳时机 III](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iii/)是一样的操作和分析
+2. 值得注意的是，这题的入参， prices.length 的范围是 [0,1000]， 所以需要进行判空处理；而 [123. 买卖股票的最佳时机 III](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iii/) 中的 prices.length 的范围是 [1,pow(10,5)], 所以可以直接使用
+
+```javascript
+var maxProfit = function(k, prices) {
+    const len = prices.length
+    if(len<2) return 0
+    // dp[i][j][k] -- i 为 [0,len-1] j:0,1 ; k 为 [0,k]
+    const dp =Array.from(prices).map(() => Array.from({length:2}).map(() => new Array(k+1).fill(0)))
+    for (let i = 0; i < prices.length; i++) {
+        // base case1 -- 交易次数为 0 的时候
+        dp[i][0][0] = 0
+        dp[i][1][0] = 0
+        for (let j = 1; j <= k; j++) {
+            if(i === 0){
+                // base case2 -- 第一天交易
+                dp[0][0][j] = 0
+                dp[0][1][j] = -prices[0]
+                continue
+            }
+            dp[i][0][j] = Math.max(dp[i-1][0][j],dp[i-1][1][j]+prices[i])          
+            dp[i][1][j] = Math.max(dp[i-1][1][j],dp[i-1][0][j-1]-prices[i])          
+        }
+    }
+    return dp[prices.length-1][0][k]
+};
+
+```
+
+### [309. 最佳买卖股票时机含冷冻期](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
+ 分析
+ 1. 买卖 n 次， 需要间隔 1 天, 不收手续费
+ 2. dp_0_0 表示没有持有，不处于冷却期，dp_0_1 表示没有持有，处于冷却期, dp_1_0 正常情况，持有的时候没有冷却期， dp_1_1 属于矛盾的状态，忽略
+ 3. 状态转移方程:
+    - dp_0_0 = Math.max(dp_0_0, dp_0_1);
+    - dp_0_1 = dp_1_0 + prices[i];
+    - dp_1_0 = Math.max(dp_1_0,temp - prices[i]);
+4. base case: dp_0_0 = 0, dp_0_1 = 0, dp_1_0 = -prices[0];
+5. 主要注意有冷却期的是没有持有才会触发，所以总共只有三种状态,dp_0_0 = 0, dp_0_1, dp_1_0； 所以可以直接将空间复杂度压缩到 ${O(1)}$
+```javascript
+var maxProfit = function (prices) {
+  const len = prices.length;
+  if (len < 2) return 0;
+  let dp_0_0 = 0,
+    dp_0_1 = 0,
+    dp_1_0 = -prices[0];
+
+  for (let i = 1; i < len; i++) {
+    const temp = dp_0_0;
+    // 不在冷却中的没持有状态，证明上一次只可能是没有持有的状态
+    dp_0_0 = Math.max(dp_0_0, dp_0_1);
+    dp_0_1 = dp_1_0 + prices[i];
+    dp_1_0 = Math.max(dp_1_0,temp - prices[i]);
+  }
+  return Math.max(dp_0_0, dp_0_1);
+};
+
+console.log(maxProfit([1, 2, 4]));
+
+```
+
+### [714. 买卖股票的最佳时机含手续费](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/submissions/)
+分析
+1. 买卖 n 次， 无间隔, 收手续费
+2. 由于要收手续费，那么就不是怎么买卖都是好的了，必须将成本算上去，之前都是无本例如，只需要低买高卖就成，现在必须考虑可能会亏的可能
+3. 整体分析和 [122. 买卖股票的最佳时机 II](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii/submissions/) 一样，只是在卖出的时候，加上 fee 即可
+
+```javascript
+ var maxProfit = function(prices, fee) {
+    let dp_0 = 0, dp_1 = -prices[0]
+    for (let i = 1; i < prices.length; i++) {
+        const temp =dp_0
+        dp_0 = Math.max(dp_0,dp_1 + prices[i] - fee)
+        dp_1 = Math.max(dp_1,temp - prices[i])
+    }
+    return dp_0
+};
+```
