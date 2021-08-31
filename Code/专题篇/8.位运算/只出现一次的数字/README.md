@@ -1,13 +1,3 @@
-
-
-## 题目列表
-
-- [136. 只出现一次的数字](https://leetcode-cn.com/problems/single-number/submissions/)
-- [137. 只出现一次的数字 II](https://leetcode-cn.com/problems/single-number-ii/)
-- [260. 只出现一次的数字 III](https://leetcode-cn.com/problems/single-number-iii/solution/yi-huo-fen-zhi-wei-yun-suan-by-jzsq_lyx-bgoc/)
-
-
-## 题解
 ### [136. 只出现一次的数字](https://leetcode-cn.com/problems/single-number/submissions/)
 > 只出现一次的数字 -- 所有题目都是线性时间复杂度，空间复杂度都是常数级复杂度
 
@@ -86,55 +76,5 @@ var singleNumber = function(nums) {
     })
     return [left,right]
 };
-
-```
-
-
-
-### [78. 子集](https://leetcode-cn.com/problems/subsets/solution/hui-su-zhao-gui-lu-fa-by-jzsq_lyx-ic4q/)
-### 分析 -- 找规律法
- 1. 直接看出特殊解法
- 2. 每一个 nums 的值都需要和已经排好在 ret 中的数组进行合并，生成新的多维数组，并追加到 ret 中去
-```javascript
-
-// 78. 子集
-
-/**
- * @分析
- * 1. 直接看出特殊解法
- * 2. 每一个 nums 的值都需要和已经排好在 ret 中的数组进行合并，生成新的多维数组，并追加到 ret 中去
- */
-var subsets = function (nums) {
-  const ret = [];
-  ret.push([]); //默认有一个空的数组
-  for (let num of nums) {
-    const temp = ret.map((item) => item.concat(num));
-    ret.push(...temp);
-  }
-  return ret;
-};
-```
-
- ### 分析 -- 回溯
- 1. 回溯函数带着 nums 的下标和一个维护好的数组
- 2. 每一次回溯都存在两种情况，取nums 的值放到数组 arr 中和不取
- 3. 当且仅当下标 start === nums.length 的时候，回溯结束，将 arr push 到 ret 中去
-```javascript
-var subsets = function (nums) {
-  const ret = [];
-  const dfs = (start, arr) => {
-    if (start === nums.length) {
-      ret.push(arr);
-      return;
-    }
-    dfs(start + 1, arr);
-    dfs(start + 1, [...arr, nums[start]]);
-  };
-  dfs(0, []);
-  return ret;
-};
-
-subsets([1, 2, 3]);
-subsets([]);
 
 ```
