@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-09-03 09:46:17
- * @LastEditTime: 2021-09-07 09:54:25
+ * @LastEditTime: 2021-09-08 09:18:13
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/专题篇/2.滑动窗口/2.窗口不固定/README.md
@@ -363,4 +363,94 @@ var maxTurbulenceSize = function (arr) {
   return max;
 };
 
+```
+
+### [1004. 最大连续1的个数 III](https://leetcode-cn.com/problems/max-consecutive-ones-iii/solution/shuang-zhi-zhen-by-jzsq_lyx-obxu/)
+分析
+1. 这里其实用到的是双指针的方式
+2. 左右指针形成了一个合乎要求的区域，用 arr 来缓存从 0-1 变更的值
+3. 每当使用完变更次数 k 之后，再次遇到 0 的时候，我们只能先保存当前长度的区域，然后将 l 指针跳转到最小的变更下标，然后再次进行区域的扩充
+4. 时间复杂度 ${O(n)}$,n 是 nums 的长度； 空间复杂度 ${O(k)}$
+```javascript
+
+var longestOnes = function (nums, k) {
+  const changeArr = []; // 用 arr 来存储从 0-1 的下标的值
+  let l = (r = 0);
+  let ret = 0;
+  while (r < nums.length) {
+    const rr = nums[r];
+    if (k === 0) {
+      // 特殊情况，不做任何处理
+      if (rr === 0) {
+        ret = Math.max(ret, r - l); // 先保存当前的这个长度
+        l = r + 1;
+      }
+    } else {
+      if (rr === 0 && changeArr.length === k) {
+        // 当前值是 0，且已经变更了 k 次，无法再变了
+        ret = Math.max(ret, r - l); // 先保存当前的这个长度
+        // 由于是连续的变动，所以 l 可以直接指向第一个变动值之前
+        l = changeArr.shift() + 1;
+      }
+      if (rr === 0 && changeArr.length < k) {
+        changeArr.push(r);
+      }
+    }
+    r++;
+  }
+  return Math.max(ret, r - l);
+};
+console.log(longestOnes([0, 0, 1, 1, 1, 0, 0], 0));
+
+```
+
+### [1234. 替换子串得到平衡字符串](https://leetcode-cn.com/problems/replace-the-substring-for-balanced-string/solution/maphua-chuang-by-jzsq_lyx-mh2n/)
+
+分析
+1. 本题最难的点在于切分好窗口，窗口里的值是待变更的，窗口外的值是已经确定好的，对应的每一个字符的数量都小于等于 n/4
+2. 为什么要这样来初始化窗口，窗口外的值的字符数量小于等于 n/4, 那么就可以变更窗口里的值，使得最终的值符合平衡字符串，因为窗口的值可以任意变，但是一旦外面某个字符的数量超出 n/4, 然后变更窗口的值，使得最终的数量变少了吧；
+3. 先遍历一遍，保存所有字符对应的数量到 map 中，注意，这里要先初始化 QWER， 保证 map 中有这4个 key
+4. 用 valid 表示滑窗外满足字符小于等于 n/4 的数量，边际条件，如果直接满足，返回 0
+5. 然后 r 指针滑动扩展窗口，map 会减少对应字符的数量，当 rr 字符的值达到临界值的时候，valid 会发生变更
+6. 当 valid === 4 的时候，表示滑窗外已经满足要求，只要改变滑窗长度的字符，就能实现平衡，这个时候固定 r 指针，移动 l 指针缩小窗口
+7. 时间复杂度 ${O(n)}$,  空间复杂度 ${O(n)}$
+```javascript
+var balancedString = function (s) {
+  const n = s.length;
+  const max = n / 4; // 这里 n 就是 4 的倍数，入参会做好设定的
+  const map = new Map();
+  map.set("Q", 0);
+  map.set("W", 0);
+  map.set("E", 0);
+  map.set("R", 0);
+  for (let ss of s) {
+    map.set(ss, map.get(ss) + 1 );
+  }
+  let valid = 0; // 有多少个变量满足小于等于 n/4
+  [...map.values()].forEach((v) => {
+    if (v <= max) valid++;
+  });
+  if (valid === 4) return 0; //特殊情况，直接结束
+  let l = (r = 0);
+  let ret = Infinity;
+  while (r < n) {
+    const rr = s[r];
+    map.set(rr, map.get(rr) - 1);
+    if (map.get(rr) === max) {
+      // 如果减去之后刚好符合要求，则 valid 增加
+      valid++;
+    }
+    while (valid === 4) {
+      // 窗口符合要求，开始收缩窗口
+      ret = Math.min(ret, r - l + 1); // 先缓存一个
+      const ll = s[l];
+      l++;
+      map.set(ll, map.get(ll) + 1); //收缩滑窗，则滑出去的加入到 map 中去
+      if (map.get(ll) > max) valid--;
+    }
+    // 一直使得 valid 的值少于 4为止
+    r++;
+  }
+  return ret;
+}
 ```
