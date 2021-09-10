@@ -1,13 +1,16 @@
 <!--
  * @Author: your name
  * @Date: 2021-09-03 09:46:17
- * @LastEditTime: 2021-09-08 09:18:13
+ * @LastEditTime: 2021-09-09 09:24:57
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/专题篇/2.滑动窗口/2.窗口不固定/README.md
 -->
 
 
+
+
+## 题目
 ### [3. 无重复字符的最长子串](https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/solution/mapbu-gu-ding-da-xiao-de-hua-chuang-by-j-9sgy/)
 
 ```javascript
@@ -453,4 +456,72 @@ var balancedString = function (s) {
   }
   return ret;
 }
+```
+
+### [1248. 统计「优美子数组」](https://leetcode-cn.com/problems/count-number-of-nice-subarrays/solution/shuang-hua-chuang-by-jzsq_lyx-er3o/)
+@分析
+1. 用 odd 表示窗口里存在的奇数, 只要超过了，就必须收缩窗口 -- 不定滑窗
+2. 这里和 [930. 和相同的二元子数组](https://leetcode-cn.com/problems/binary-subarrays-with-sum/solution/shuang-hua-chuang-shuang-zhi-zhen-qian-z-s4yi/), [992. K 个不同整数的子数组](https://leetcode-cn.com/problems/subarrays-with-k-different-integers/solution/shuang-hua-chuang-by-jzsq_lyx-yryh/)  类似，需要构建双滑窗
+3. 时间复杂度为 ${O(n)}$
+
+```javascript
+
+var numberOfSubarrays = function(nums, k) {
+    let ret = 0
+    let odd1 = 0
+    let odd2 = 0
+    let l1 = l2 = r = 0
+    while(r<nums.length){
+        const rr = nums[r]
+        if(rr%2){
+            odd1++
+            odd2++
+        }
+        while(odd1>k){
+            // 收缩 l1
+            const ll =nums[l1]
+            l1++
+            if(ll%2) odd1--
+        }
+        while(odd2 >= k){
+            // 收缩 l1
+            const ll =nums[l2]
+            l2++
+            if(ll%2) odd2--
+        }
+        // 这个时候 [l1,l2) 都属于可以合格的数组
+        ret+=l2-l1
+        r++
+    }
+    return ret
+};
+```
+
+### [1658. 将 x 减到 0 的最小操作数](https://leetcode-cn.com/problems/minimum-operations-to-reduce-x-to-zero/solution/hua-dong-chuang-kou-by-jzsq_lyx-bz12/)
+分析
+1. 其实这道题截止条件可以转成，设置一个窗口，使得 total - sum === x ,其中 total 就是数组的总和，sum 就是窗口里的值的和；这样移除的值就刚好等于 x 了
+2. 在这么多情况下，我们维护一个窗口的长度最大的时候，那么移除的元素就越少，也就是对应的操作数最少
+```javascript
+var minOperations = function(nums, x) {
+    const len = nums.length
+    const total = nums.reduce((prev,cur) => prev+cur,0)
+    if(total<x) return -1 //边界，如果总和都不达 x, 那就直接跑路吧
+    let ret = Infinity //最少的操作数
+    let sum = 0
+    let l =r =0
+    while(r<len){
+        sum+=nums[r]
+        while(total-sum<x){
+            // 外面的值已经小于 x 了，所以需要收缩窗口
+            sum-=nums[l]
+            l++
+        }
+        if(total-sum === x){
+            // 符合要求
+            ret= Math.min(ret,len-(r-l+1))
+        }
+        r++
+    }
+    return ret=== Infinity?-1:ret
+};
 ```
