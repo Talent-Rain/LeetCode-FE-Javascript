@@ -1,7 +1,15 @@
+<!--
+ * @Author: your name
+ * @Date: 2021-09-05 17:43:58
+ * @LastEditTime: 2021-09-11 11:01:20
+ * @LastEditors: your name
+ * @Description: In User Settings Edit
+ * @FilePath: /LeetCode-FE-Javascript/Code/专题篇/2.滑动窗口/1.固定窗口大小/README.md
+-->
 
 ### [438. 找到字符串中所有字母异位词](https://leetcode-cn.com/problems/find-all-anagrams-in-a-string/solution/hua-dong-chuang-kou-by-jzsq_lyx-n5qp/)
 @分析
-0. [209. 长度最小的子数组](https://leetcode-cn.com/problems/minimum-size-subarray-sum/submissions/) 思路差不多
+0. 本题与 [209. 长度最小的子数组](https://leetcode-cn.com/problems/minimum-size-subarray-sum/submissions/) 思路差不多
 1. 这道题窗口就固定为 p 的长度大小了，所以看着是固定窗口大小的题目 -- 但是这里用的却是不定窗口的思路，但是窗口长度成了一个限定值，一旦超出限定的窗口大小，就收缩一次
 2. 虽然题目说的是找字幕异位词，但是从实际的例子可以看出，只要是符合 p 的字符对应的子串就 ok 了，不管得出的 ss 是否和 p 是一样的排列
 3. 用 pMap 存储 p 的字符状态，sMap 用来存储固定窗口的值，用 sMap 中的 valid 变量类型数量和 pMap 中的比对，用来判断是否符合要求
