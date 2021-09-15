@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-09-10 09:43:17
- * @LastEditTime: 2021-09-11 10:22:57
+ * @LastEditTime: 2021-09-15 09:15:24
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/基础篇/5.双指针/快慢指针/README.md
@@ -111,4 +111,63 @@ var findDuplicate = function (nums) {
         write = read
     }
 };
+```
+
+### [202. 快乐数](https://leetcode-cn.com/problems/happy-number/solution/yong-sethuan-cun-shi-yong-shuang-zhi-zhe-vu88/)
+
+分析
+1. 这里盲猜是用迭代的写法来求，因为没次按要求改造一个 ret，如果不符合成功或者失败要求，就会继续迭代下去
+2. 因为是不断按十进制位取平方求和，所以截止条件应该是符合要求，得到的和 sum === 1
+3. 如果不符合条件，肯定就是遭遇到循环了，这里用 set 缓存所有迭代过程中的 ret，只有迭代过程中再次出现 set 中的值，就是导致循环了，直接返回false 即可
+4. 时间复杂度,这个不太会求，但是会需要 set 来缓存数据
+```javascript
+var isHappy = function (n) {
+    const set = new Set()
+    let result
+    const dfs = n => {
+        let ret = 0;
+        while (n) {
+          ret += Math.pow(n % 10, 2);
+          n = Math.floor(n / 10);
+        }
+        if(ret === 1)  {
+            result = true
+            return 
+        }
+        if(set.has(ret)){
+            result = false
+            return 
+        }
+        set.add(ret)
+        // 迭代写法，如果用 return 就是递归的写法了
+        dfs(ret);
+    }
+    dfs(n)
+    return result
+
+};
+```
+
+分析
+1. 这是快慢指针专题，所以其实可以用快慢指针是否有环来处理
+2. 所以迭代的过程就和链表的 next 是差不多的，如果出现环，则返回 false，如果出现值 1，则返回 true
+3. 这样就不需要额外的 set 去缓存值了
+```javascript
+var isHappy = function (n) {
+    function getNext(n) {
+        let ret = 0;
+        while (n) {
+          ret += Math.pow(n % 10, 2);
+          n = Math.floor(n / 10);
+        }
+        return ret
+    }
+    let s = f = n // 初始化的值都是 n
+    while(f !== 1 && getNext(f) !== 1){
+        s = getNext(s)
+        f = getNext(getNext(f))
+        if(s === f) return false
+    }
+    return true
+}
 ```

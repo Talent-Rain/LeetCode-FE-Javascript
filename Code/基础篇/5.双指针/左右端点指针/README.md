@@ -1,12 +1,3 @@
-<!--
- * @Author: your name
- * @Date: 2021-09-13 09:04:19
- * @LastEditTime: 2021-09-14 10:15:09
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: /LeetCode-FE-Javascript/Code/基础篇/5.双指针/左右端点指针/README.md
--->
-
 
 ### [16. 最接近的三数之和](https://leetcode-cn.com/problems/3sum-closest/)
 分析
@@ -91,6 +82,68 @@ var sortedSquares = function(nums) {
         }
     }
     return ret
+};
+
+```
+
+
+### [875. 爱吃香蕉的珂珂](https://leetcode-cn.com/problems/koko-eating-bananas/solution/er-fen-shuang-zhi-zhen-by-jzsq_lyx-l0qa/)
+
+分析 -- 二分
+1. l = 1 , r = piles[max],他们分别代表了最大和最小的速度； 这样找出中间值，然后判断是否能在 h 小时内吃完，能吃完则向左逼近，不能吃完则向右逼近，直到最小的速度出现
+2. 每一次二分取 mid 之后，都要遍历一次 piles， 所以时间复杂度是 ${nlogn}$
+```javascript
+var minEatingSpeed = function (piles, h) {
+  let l = 1,
+    r = piles.reduce((prev, cur) => (prev >= cur ? prev : cur), 1);
+  while (l <= r) {
+    const mid = ((r - l) >> 1) + l;
+    if (getHours(mid) > h) {
+      // 需要的时间超出了 h, 证明速度不够
+      l = mid + 1;
+    } else {
+      r = mid - 1;
+    }
+  }
+
+  // 速度为 v 的时候，需要多久吃完
+  function getHours(v) {
+    let ret = 0;
+    for (let i = 0; i < piles.length; i++) {
+      ret += Math.ceil(piles[i] / v);
+    }
+    return ret;
+  }
+  return l;
+};
+
+```
+
+
+### [881. 救生艇](https://leetcode-cn.com/problems/boats-to-save-people/solution/shuang-zhi-zhen-by-jzsq_lyx-0jl8/)
+分析
+1. 由于这里最多只能载人 2， 负重最多是 limit，所以选择载人的时候，尽量先选择最重的和最轻的进行匹配，尽量一船二人坐，可以减少数量，所以先给 people 排序
+2. l,r 指针指向最轻和最重的人
+3. 然后每次求出2人组合的最轻总量和 sum， 让它和 limit 进行比较，进而控制 l, r 的移动
+4. 时间复杂度 ${O(nlogn)}$ 主要是排序问题
+
+```javascript
+var numRescueBoats = function (people, limit) {
+  let l = 0,
+    r = people.length - 1;
+  people.sort((a, b) => a - b);
+  let count = 0; // 需要的船的数量
+  while (l <= r) {
+    const sum = people[l] + people[r];
+    if (sum > limit) {
+      r--;
+    } else {
+      l++;
+      r--;
+    }
+    count++;
+  }
+  return count;
 };
 
 ```
