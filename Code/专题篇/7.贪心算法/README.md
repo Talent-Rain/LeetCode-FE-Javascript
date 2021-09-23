@@ -1,3 +1,11 @@
+<!--
+ * @Author: your name
+ * @Date: 2021-09-22 09:19:21
+ * @LastEditTime: 2021-09-23 09:52:10
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /LeetCode-FE-Javascript/Code/专题篇/7.贪心算法/README.md
+-->
 ### [455. 分发饼干](https://leetcode-cn.com/problems/assign-cookies/solution/tan-xin-by-jzsq_lyx-y1d6/)
 分析 -- 贪心
 1. 用最大的饼干满足胃口最大的小孩，这样就能局部最优求出全局最优，可以满足最多的小孩
@@ -48,4 +56,74 @@ var wiggleMaxLength = function(nums) {
     }
     return ret
 };
+```
+
+
+### [53. 最大子序和](https://leetcode-cn.com/problems/maximum-subarray/)
+分析 -- 贪心
+1. 求的是最大和的`连续子数组`
+2. 用 sum 缓存前面和大于 0 的子数组之和，一旦小于 0 ，就不再累加，重新置 0, 保持每一次迭代前 sum 的值都是 >=0
+3. 这样对于每一个局部子数组，它的累加值都是大于等于 0 的，这样每次累加一个新值，就进行最大值比较，保证整体是一个最大子数组之和
+4. 时间复杂度 ${O(n)}$
+```javascript
+var maxSubArray = function (nums) {
+  let max = -Infinity;
+   let sum = 0
+   for(let i = 0 ;i<nums.length;i++){
+       sum+=nums[i]
+       max = Math.max(sum,max)
+       if(sum<=0){
+           sum=0
+       }
+   }
+   return max
+};
+
+```
+
+### [55. 跳跃游戏](https://leetcode-cn.com/problems/jump-game/solution/ju-bu-yue-guo-0-de-jie-dian-zheng-ti-ke-b0tep/)
+分析 -- 回溯 -- 超时了
+1. 直接将所有可能性写出来，将对应不合适的移除
+2. 时间复杂度 ${n*m}$ 其中 n 是nums 的长度，m 是每一个值的大小
+```javascript
+
+ var canJump = function (nums) {
+    let ret = false;
+    const dfs = (start) => {
+      // 只要有一个成功，就直接不做其他处理了
+      if (start >= nums.length || ret) return;
+      if (start+nums[start] >= nums.length-1) {
+        ret = true;
+        return;
+      }
+      for (let i = 1; i <= nums[start]; i++) {
+        dfs(start + i); // 在当前这一个节点，可以跳的步数
+      }
+    };
+    dfs(0)
+    return ret;
+  };
+```
+
+分析
+1. 这里只要不遇到值为 0 就可以继续往后走，也就是局部贪心就是要跳过值为 0 的步骤
+2. 当然如果 0 是在数组最后一位也是 ok 的
+3. 我们可以判断一下是否存在一个值 nums[valIndex] > 0Index - valIndex, 这样只要到达 valIndex 就可以越过 0 这个点了
+4. 所以我们需要遍历所有节点，找到值为 0 的节点，然后再进行跳跃判断；
+5. 由于我们是要走到最后一个下标，所以最后一个下标是不用判断的，所以 i 最多走到 nums.length-1 的位置
+6. 时间复杂度最小是 ${n}$，
+```javascript 
+ var canJump = function (nums) {
+    for(let i=0;i<nums.length-1;i++){
+        if(nums[i] === 0){
+            // 开始寻找可以跳过当前 i 值的节点
+            let valIndex = i-1
+            while(nums[valIndex]<= i -valIndex && valIndex>=0){
+                valIndex--
+            }
+            if(valIndex<0) return false
+        }
+    }
+    return true
+ }
 ```
