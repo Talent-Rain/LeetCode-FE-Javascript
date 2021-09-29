@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-09-22 09:19:21
- * @LastEditTime: 2021-09-27 09:47:54
+ * @LastEditTime: 2021-09-29 09:47:48
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/专题篇/7.贪心算法/README.md
@@ -292,4 +292,223 @@ var candy = function (ratings) {
   return candies.reduce((pre, cur) => pre + cur, 0);
 };
 
+```
+
+### [860. 柠檬水找零](https://leetcode-cn.com/problems/lemonade-change/solution/tan-xin-bao-cun-geng-xi-li-du-de-wu-liao-1n1u/)
+分析
+1. 如果能思考到局部贪心，基本就是一道遍历题
+2. 由于 5 元属于更小粒度的单位，在数量足够的时候可以组合成 10 元， 所以我们在给 20 元找零的时候，局部贪心的保存 5 元，这样能保证出力后续的时候更可能完成任务
+3. 所以剩下的就是将情况排列出来了
+4. 时间复杂度 ${O(n)}$
+```javascript
+var lemonadeChange = function(bills) {
+    let fives = 0
+    let tens = 0
+ 
+     for(let i =0;i<bills.length;i++){
+         const b = bills[i] 
+         if(b === 5){
+            fives++
+         }
+         if(b === 10 ) {
+             if(fives>0){
+                 fives--
+                 tens++
+             }else {
+                 return false
+             }
+         }
+         if(b === 20){
+             // 现在用贪心，先尽可能的用 10 块去找零，因为 5 块是粒度更小的零钱，它通用性更强，所以尽可能贪心的保存 5 块
+             if(tens>0 && fives>0){
+                tens--
+                fives--
+             }else if (tens === 0 && fives>=3){
+                 fives -=3
+             }else{
+                 return false
+             }
+         }
+     }
+     return true
+ 
+ };
+```
+
+
+### [406. 根据身高重建队列](https://leetcode-cn.com/problems/queue-reconstruction-by-height/solution/zhao-dao-mei-ci-sheng-yu-de-zui-da-gao-d-egiy/)
+分析
+1. 先分类，将身高一样的先缓存在一起
+2. 然后根据 key 从高到低开始贪心的排列，因为每一次我们都取`最高且前面人数最少`的 item， 这个时候队列的两个条件已经一起限制好，只需要按照 item[i] 插入到 ret 上就足够了 -- 后续的插入是不会影响到当前插入的，因为后续的值肯定会贴合现有排好的 ret；
+3. 我们可以先取出身高更高的值，因为这个时候，排在它前面的，就只有它自己和已经排好的数组 -- 这就是局部贪心
+4. 这个时候在相同身高的数组里，还要根据前面的人数进行一次排序，保证少的在前面 -- 这样当前 item 插入到最终 ret 的时候，它就可以根据 item[1] 直接插入到 ret 对应的位置了
+5. 时间复杂度 ${O(n)}$,空间复杂度 ${O(n)}$
+```javascript
+var reconstructQueue = function(people) {
+    const map = new Map(); // 先将身高一眼给的缓存起来
+    for(let i = 0;i<people.length;i++){
+        const key = people[i][0]
+        map.set(key,map.get(key)?[...map.get(key),people[i]]:[people[i]])
+    }
+    const arr = [...map.keys()].sort((a,b)=>b-a) // 从大到小
+    const ret = []
+    for(let i = 0;i<arr.length;i++){
+        const tempArr = map.get(arr[i]) // 取出数组
+        tempArr.sort((a,b)=>a[1]-b[1]) // 身高相同的数组，要根据在他们前面的人的数量进行排序，这样才能保证前面人少的在前面
+        // 这个时候需要只需要按找数组的第二个值，插入到最终数组即可
+        for(let temp of tempArr){
+           ret.splice(temp[1],0,temp) // 在 temp[1] 的位置插入 temp
+        }
+    }
+    return ret
+};
+
+const ret = reconstructQueue([[7,0],[4,4],[7,1],[5,0],[6,1],[5,2]]);
+console.log(ret)
+```
+
+
+### [452. 用最少数量的箭引爆气球](https://leetcode-cn.com/problems/minimum-number-of-arrows-to-burst-balloons/solution/pai-hao-xu-cai-neng-geng-hao-de-tan-xin-x74ey/)
+分析 -- 失败
+1. 首先要审题并理解题目，虽然说的是二维空间的气球，但是实际排列的时候在一个坐标 x 上可能会存在气球的重叠；所以当箭从 x 射进去，就可以一次打破 n>1 个气球
+2. 所以题目就转换成 -- 每次找到`重叠最多`的位置进行射击，当气球射完需要多少箭；-- 也就是找到交集的数量 
+3. 这里可以和并查集进行对比，并查集遇到交集后，会扩展集合为并集，而这里是收缩到交集，所以刚好是相反的概念
+4. 这里用到的贪心思想就是，一旦有交集，我们就把两个气球收缩为一个更小的气球，局部贪心的将有交集的气球压缩到一个更小的气球中，这样最后剩下的气球就是相互隔离的，达到全局的贪心 -- 尽可能少的射击
+5. 时间复杂度 ${O(n)}$,空间复杂度 ${O(n)}$
+6. 这种写法失败的原因在于，随机找出来一个区间值，这个区间值的收缩是随机的，所以就会出现一个很小的区间 A 将本来可以容纳更多气球的某一个区间 B 收缩的很小区间 C，使得最后的结果不够贪心，而最优的情况是将区间 A 放在另外的一个区间 A1 上，然后让 B 区间容纳更多的气球 B1,B2；
+7. 所以需要将无序的气球按排好序，这样按顺序在局部范围内最贪心的重叠气球，就可以保证在局部范围内，尽可能小的缩小取值区间，容纳更多的气球 -- 具体看`分析2`
+```javascript
+
+ var findMinArrowShots = function(points) {
+    const len =  points.length 
+    let ret = [] // 缓存没有交集的数组
+    for(let i =0;i<len;i++){
+        const pp  = points[i]
+        let isMerge = false
+        for(let i = 0;i<ret.length;i++){
+            const rr = ret[i]
+            // 如果起始位置都超过了终止位置，那么就没有交集了
+            if(pp[0]>rr[1] || pp[1]< rr [0]) continue
+            // 否则就是有交集了，那么只要保存交集就好，因为射中交集的时候，一次性就完成所有的气球爆炸
+            ret[i] =  pp[0]<=rr[0]?[rr[0],Math.min(pp[1],rr[1])]:[pp[0],Math.min(pp[1],rr[1])]
+            isMerge = true // 如果合并了
+            break
+        }
+        if(!isMerge){
+            ret.push(pp)
+        }
+    }
+    return ret.length
+};
+```
+
+分析2
+1. 基于上面那种两边同时限制，会出现分组限制更多的情况，我们限制其中一边进行排序，尽可能使用其中一边作为限制条件，在这里我们根据 left 作为排序依据进行排序
+2. 排序之后，我们只需要判断新的气球的最左边是否离开了当前气球的最右边，就可以判断是否是同一组；
+3. 如果属于同一组，那么需要现在这一组最 right 的位置，这个位置也是射击的最右位置，保证往这个点射进去，这一组的气球全爆，所以需要找的是交集最小值
+4. 时间复杂度 ${O(nlogn)}$, 空间复杂度 ${O(1)}$
+5. 这里用到的贪心思想就是尽可能局部最多重叠的气球，而上题也是因为没法保证会让最多重叠气球放在一起
+```javascript
+var findMinArrowShots = function(points) {
+    const len =  points.length 
+    points.sort((a,b)=>a[0]-b[0])
+    let cur = -Infinity;
+    let ret = 0
+    for(let i = 0 ;i<len;i++){
+        const pp  = points[i]
+        if(pp[0]>cur) {
+            // 超出范围了
+            ret++
+            cur = pp[1] // 修改
+        }else{
+            cur = Math.min(cur,pp[1])
+        }
+    }
+    return ret
+}
+
+findMinArrowShots([[10,16],[2,8],[1,6],[7,12]])
+findMinArrowShots([[1,2]])
+findMinArrowShots([[3,9],[7,12],[3,8],[6,8],[9,10],[2,9],[0,9],[3,9],[0,6],[2,8]])
+```
+
+分析3 -- 右侧节点排序
+1. 使用左侧节点排序，在重合区域要保证 right 节点最小，这个才能保证下一个值可以落到集合的交汇处
+2. 但是使用右侧排序的时候，本身 right 节点就比 left 节点要大，所以右侧排序后，其他的节点对于当前节点 [l1,r1] 而言，只要 l2 < r1, 那么必然是存在于区间内的，而且只要存在于区间内，那么 right 值都不需要变，因为第一个取值就是最小了，所以有下面的写法
+3. 这种排序更直观一点，画图会更好看清楚
+```javascript
+var findMinArrowShots = function(points) {
+    const len =  points.length 
+    points.sort((a,b)=>a[1]-b[1]) // 右侧排序
+    let right = -Infinity;
+    let ret = 0
+    for(let i = 0 ;i<len;i++){
+        const pp  = points[i]
+        if(pp[0]>right) {
+            // 超出范围了
+            ret++
+            right = pp[1] // 修改
+        }
+    }
+    return ret
+}
+```
+
+### [435. 无重叠区间](https://leetcode-cn.com/problems/non-overlapping-intervals/)
+分析
+1. 和 [452. 用最少数量的箭引爆气球](https://leetcode-cn.com/problems/minimum-number-of-arrows-to-burst-balloons/solution/pai-hao-xu-cai-neng-geng-hao-de-tan-xin-x74ey/) 类似，只是那边尽可能集合在一起，这里是要分开
+2. 所以这里以区间的右侧值做排序，这样 的好处就是，一旦某个值的 left 大于当前的 right 值，那么就出现完全隔离的区间了；
+3. 最后的答案就是长度减去可以完全隔离的区间
+```javascript
+var eraseOverlapIntervals = function(intervals) {
+    const length = intervals.length
+    intervals.sort((a,b) => a[1]-b[1]) // 按右侧大小排列好
+    let  right = -Infinity
+    let ret = 0 // 集合数量
+    for(let i = 0;i<length;i++){
+        const ii = intervals[i]
+        if(ii[0]>=right) {
+            ret++ 
+            right = ii[1]
+        }
+    }
+    return length-ret
+}
+```
+
+### [763. 划分字母区间](https://leetcode-cn.com/problems/partition-labels/solution/xing-si-shuang-zhi-zhen-chuang-kou-by-jz-zd85/)
+分析
+1. 题目限制条件1：相同的字符只能存在于同一个字符串片段；限制条件2：尽可能多的切分字符串片段
+2. 所以我们先用 map 缓存每个字符最后出现的下标值，那么当我的字符串中存在这个字符，那么最少要走到它的尽头下标
+3. 相当于开启了一个不定长窗口，然后在这个窗口遍历过程，判断窗口的最长值是否需要扩展，当窗口遍历完成后，记录窗口的长度，然后执行下一个窗口
+4. 时间复杂度 ${O(n)}$,空间复杂度 ${O(n)}$
+5. 这里没看出局部贪心导向全局贪心，可能是保证所有相同字符都要在一起算是局部贪心吧
+```javascript
+var partitionLabels = function(s) {
+    const map = new Map() // 记录字符和最后一个字符对应的下标
+    for(let i = 0;i<s.length;i++){
+        const ss = s[i]
+        map.set(ss,i)
+    }
+    console.log(map)
+    let ret = []
+    let start = 0
+    // 现在尽可能短的获取片段
+    while(start<s.length){
+        let temp = start // 起始值
+        let end = map.get(s[start]) //第一个字母的最后一个下标
+
+        while(start<=end){
+            if(map.get(s[start])>end){
+                end = map.get(s[start]) // 将 end 变长
+            }
+            start++
+        }
+        // 抛出一轮了
+        ret.push(start-temp)
+    }
+    return ret
+};
+
+console.log(partitionLabels('ababcbacadefegdehijhklij'))
 ```
