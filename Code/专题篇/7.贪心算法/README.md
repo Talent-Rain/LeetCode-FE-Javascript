@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-09-22 09:19:21
- * @LastEditTime: 2021-09-29 09:47:48
+ * @LastEditTime: 2021-09-30 10:03:39
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/专题篇/7.贪心算法/README.md
@@ -511,4 +511,66 @@ var partitionLabels = function(s) {
 };
 
 console.log(partitionLabels('ababcbacadefegdehijhklij'))
+```
+
+### [56. 合并区间](https://leetcode-cn.com/problems/merge-intervals/)
+分析
+1. 这里是合并所有重叠的区间，不是两两重叠的区间，所以还是得排个序，这样只需哟啊判断一遍即可，不然直接写个 ret，原来不连接的区间，可能加了一个新的 item 就连接起来了，更麻烦
+2. left 节点排序是比较合适的,因为这里需要在某个节点隔断之后，往后的节点不会再影响到 ret 数组里的区间
+3. 如果用 right 节点排序，就会出现 [k,r],[k-1,r+1] 的情况，那么已经放入到单独区域的区间还要拿出来用
+4. 最后遍历一遍结束，时间复杂度 ${O(n)}$
+```javascript
+var merge = function (intervals) {
+  intervals.sort((a, b) => a[0] - b[0]);
+  let ret = [];
+  let cur = intervals[0];
+  for (let i = 1; i < intervals.length; i++) {
+    const temp = intervals[i];
+    if (temp[0] > cur[1]) {
+      // 当取出的空间的起始值已经比当前值要大的时候，那么剩下的其他值，也会完全和当前的 cur 隔离开，所以将当前 cur 推入 ret 中
+      ret.push(cur);
+      cur = temp; // 替换 cur
+    }
+    if (cur[1] < temp[1]) {
+      cur[1] = temp[1];
+    }
+  }
+  return [...ret, cur];
+};
+
+console.log(
+  merge(
+    [[1,4],[2,3]]
+  )
+);
+
+```
+
+### [738. 单调递增的数字](https://leetcode-cn.com/problems/monotone-increasing-digits/solution/ju-bu-zui-da-dao-quan-ju-zui-da-by-jzsq_-gk7o/)
+
+分析
+1. 审题，这里是要找一个最大的数 num，num 的位需要单增,也就是 1234,这样的，同时 num <= n
+2. 这题数字转字符串转数组，将每个值转成单个数值来计算了，这样更方便点
+3. 这里最后要求的是递增的数组，所以我们可以根据 i-1 和 i 之间的值进行替换，当 arr[i-1]>arr[i] 的时候， arr[i-1] 减一，设置锚点 flag
+4. 从后往前遍历完之后，找到左侧第一个需要设置为9的点，然后把后面的值全设置为9，达到最大值
+```javascript
+var monotoneIncreasingDigits = function (n) {
+    if(n<10) return n //如果是个位数，直接返回 n
+  const str = String(n)
+  const len = str.length
+  const arr = str.split('')
+  let  flag = Infinity // 标记最后一个设置为 9 的下标，从这个下标之后的值，都得换成 9
+  for(let i =len-1;i>=0;i--){
+    if(arr[i-1]>arr[i]){
+        // 如果前一位大于后一位，那么为了当增，需要将当前位减一，后一位换成 9
+        flag = i
+        arr[i-1] = arr[i-1] -1 
+    }
+  }
+
+  for (let i = flag; i < len; i++) {
+      arr[i] = 9
+  }
+  return Number(arr.join(''))
+};
 ```
