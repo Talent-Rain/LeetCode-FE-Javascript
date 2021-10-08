@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2021-10-02 23:39:26
+ * @LastEditTime: 2021-10-08 08:59:59
+ * @LastEditors: your name
+ * @Description: In User Settings Edit
+ * @FilePath: /LeetCode-FE-Javascript/Code/进阶篇/2.并查集new/1.UnionFind.js
+ */
 
  class UnionFind {
     constructor(n){
@@ -40,6 +48,5 @@ var findCircleNum = function(isConnected) {
             }
         }
     }
-    console.log(unions)
     return new Set(unions.parents).size
 }
