@@ -1,11 +1,30 @@
-<!--
- * @Author: your name
- * @Date: 2021-10-08 09:04:41
- * @LastEditTime: 2021-10-14 11:00:42
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: /LeetCode-FE-Javascript/Code/专题篇/6.分治new/README.md
--->
+## 前言
+今天没啥前言，分治很难，主要难在如何拆分后比较好治理合并，这比二分这些只要拆了就结束要难上一个 level，所以这里属于出入 `分治` 这种想法的思维，后续会尽可能的锻炼这样的做法；做一道分治，如果能用其他方法代替的时候，一般分治不算是最优解，起码很伤脑子；
+
+引流一下 
+
+[学完这几道并查集，就能愉快地脑筋急转弯了！](https://juejin.cn/post/7016492133695619086)
+
+[刷完这 18 道贪心，妈妈再也不用担心我看到贪心就害怕了！](https://juejin.cn/post/7013926358107553806)
+
+[刷完这 15 道回溯，就可以无脑暴力手撕前端面试了](https://juejin.cn/post/7010321663912837151)
+
+[刷完这些双指针题，就可以手撕前端面试了](https://juejin.cn/post/7007969268222558215)
+
+[刷完这 12 道滑动窗口，就可以手撕前端面试了](https://juejin.cn/post/7005746866381914125)
+
+[刷完这 20 道二分题，可能还是手撕不了大厂面试](https://juejin.cn/post/6999053946807386119)
+
+[刷完这几道堆题，可能还是手撕不了大厂面试](https://juejin.cn/post/6990532472279105572/)
+
+[刷完这 30 道树题，可能还是手撕不了大厂面试](https://juejin.cn/post/6993955773218816008)
+
+[刷完这 20 道链表题，可能还是手撕不了大厂面试](https://juejin.cn/post/6996127305919627277) 
+
+[刷完这 15 道 dp 题，只能碰运气押题进大厂了](https://juejin.cn/post/7001862751454756894) 
+
+[刷完这几道位运算，等等再考虑手撕大厂面试吧 -- 没通过审核，后面改了之后再搞](https://juejin.cn/post/7001862751454756894)
+
 
 ## 正文 -- 参考 lucifer 的分治专题笔记
 
@@ -40,6 +59,13 @@
 ### 小结
 - 如果一个问题被文杰为若干个不重叠的独立子问题，并且子问题可以推到出原问题，我们就可以用分治来解决；
 
+## 题目汇总
+- [53. 最大子序和](https://leetcode-cn.com/problems/maximum-subarray/solution/53-zui-da-zi-xu-he-fen-zhi-fa-by-jzsq_ly-hmra/)
+- [96. 不同的二叉搜索树](https://leetcode-cn.com/problems/unique-binary-search-trees/solution/fen-zhi-dp-by-jzsq_lyx-mc8i/)
+- [169. 多数元素](https://leetcode-cn.com/problems/majority-element/solution/169-duo-shu-yuan-su-fen-zhi-mo-er-tou-pi-ip51/)
+- [23. 合并K个升序链表](https://leetcode-cn.com/problems/merge-k-sorted-lists/)
+- [932. 漂亮数组](https://leetcode-cn.com/problems/beautiful-array/solution/fen-zhi-by-jzsq_lyx-qi3m/)
+- [215. 数组中的第K个最大元素](https://leetcode-cn.com/problems/kth-largest-element-in-an-array/)
 
 
 ## 题目
