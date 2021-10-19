@@ -1,4 +1,4 @@
-// 146. LRU 缓存机制
+// 146. LRU 缓存机制 -- 最近最少使用
 // https://leetcode-cn.com/problems/lru-cache/
 
 /**
