@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-10-16 20:16:02
- * @LastEditTime: 2021-10-19 18:31:29
+ * @LastEditTime: 2021-10-20 14:38:07
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /LeetCode-FE-Javascript/Code/进阶篇/设计题/README.md
@@ -330,3 +330,51 @@ LFUCache.prototype.insFreq = function(node) {
     }
 }
 ```
+
+### [705. 设计哈希集合](https://leetcode-cn.com/problems/design-hashset/)
+分析
+1. 由于 key 的大小不超过 10^6, 所以用空间换时间，直接将 key 作为数组的下标存储起来
+2. 这样 add,remove,containers 的时间复杂度都是 ${O(1)}$， 但是整体的空间复杂度会很高
+3. 真正的 hash 处理集合，不应该有那么大的空间复杂度
+```javascript
+ var MyHashSet = function() {
+    this.map = []
+};
+
+MyHashSet.prototype.add = function(key) {
+    this.map[key] = true 
+};
+
+MyHashSet.prototype.remove = function(key) {
+    this.map[key] = false // 设置为 undefined , 原始值也是这样的
+};
+
+MyHashSet.prototype.contains = function(key) {
+    return !!this.map[key]
+};
+```
+
+### [706. 设计哈希映射](https://leetcode-cn.com/problems/design-hashmap/)
+分析
+1. 和 `705. 设计哈希集合` 设计类型，直接用数组缓存 put 进来的值
+2. 时间复杂度为 ${O(1)}$, 空间复杂度 ${O(n)}$
+```javascript
+var MyHashMap = function() {
+    this.map = []
+};
+
+
+MyHashMap.prototype.put = function(key, value) {
+    this.map[key] = value
+};
+
+MyHashMap.prototype.get = function(key) {
+    return this.map[key] !== undefined ? this.map[key] : -1
+};
+
+MyHashMap.prototype.remove = function(key) {
+    this.map[key] = undefined
+};
+```
+
+
